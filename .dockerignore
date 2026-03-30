@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+README.md
+server.md
+LICENSE
+logs/
+pgdata/
+tests/
+client/css/output.css
+*.md
+docker-compose*.yml
+.dockerignore

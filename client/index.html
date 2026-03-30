@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="İsim Şehir Katman — Arkadaşlarınla gerçek zamanlı oynayabileceğin retro tarzında çok oyunculu kelime oyunu. Kategorilere göre kelime bul, puan topla, sıralamada yüksel!" />
+  <meta name="keywords" content="isim şehir, kelime oyunu, çok oyunculu, online oyun, türkçe oyun, retro oyun, multiplayer" />
+  <meta name="author" content="İsim Şehir Katman" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="İsim Şehir Katman — Multiplayer Kelime Oyunu" />
+  <meta property="og:description" content="Arkadaşlarınla gerçek zamanlı oynayabileceğin retro tarzında çok oyunculu kelime oyunu." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="tr_TR" />
+  <meta property="og:site_name" content="İsim Şehir Katman" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="İsim Şehir Katman — Multiplayer Kelime Oyunu" />
+  <meta name="twitter:description" content="Arkadaşlarınla gerçek zamanlı oynayabileceğin retro tarzında çok oyunculu kelime oyunu." />
+
+  <title>İsim Şehir Katman — Multiplayer Kelime Oyunu</title>
+  <link rel="canonical" href="/" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/css/output.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Mono&display=swap" rel="stylesheet" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "İsim Şehir Katman",
+    "description": "Arkadaşlarınla gerçek zamanlı oynayabileceğin retro tarzında çok oyunculu kelime oyunu",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web Browser",
+    "inLanguage": "tr",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TRY"
+    }
+  }
+  </script>
+</head>
+<body class="bg-retro-bg text-retro-text min-h-screen">
+  <noscript>
+    <div style="padding:2rem;text-align:center;color:#e0e0e0;background:#1a1a2e;min-height:100vh;">
+      <h1>İsim Şehir Katman</h1>
+      <p>Bu oyun çalışmak için JavaScript gerektirir. Lütfen tarayıcınızda JavaScript'i etkinleştirin.</p>
+    </div>
+  </noscript>
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <!-- Modal Container -->
+  <div id="modal-container"></div>
+
+  <!-- Announcement Banner -->
+  <div id="announcement-banner" class="hidden fixed top-0 left-0 right-0 bg-retro-gold text-retro-bg p-3 text-center font-pixel text-xs z-[60] shadow-lg"></div>
+
+  <!-- Main App Container -->
+  <div id="app" class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header id="app-header" class="bg-retro-surface border-b-2 border-retro-accent/30 px-4 py-3">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <a href="/" data-link class="flex items-center gap-2">
+          <span class="font-pixel text-retro-accent text-sm">İSİM ŞEHİR</span>
+          <span class="font-pixel text-retro-gold text-xs">KATMAN</span>
+        </a>
+        <nav id="nav-menu" class="flex items-center gap-4">
+          <!-- Dinamik olarak doldurulur -->
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app-content" class="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+      <!-- Router buraya render eder -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-retro-surface border-t-2 border-retro-accent/30 px-4 py-3 text-center">
+      <p class="font-mono text-xs text-retro-text/50">
+        İsim Şehir Katman &copy; 2026. Tüm hakları saklıdır.
+        <a href="/privacy" data-link class="text-retro-accent/60 hover:text-retro-accent ml-2">Gizlilik Politikası</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/utils/store.js"></script>
+  <script src="/js/utils/api.js"></script>
+  <script src="/js/utils/router.js"></script>
+  <script src="/js/utils/validators.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/modal.js"></script>
+  <script src="/js/components/chat.js"></script>
+  <script src="/js/components/timer.js"></script>
+  <script src="/js/components/notification.js"></script>
+  <script src="/js/components/categoryEditor.js"></script>
+  <script src="/js/components/letterSelector.js"></script>
+  <script src="/js/views/auth.js"></script>
+  <script src="/js/views/lobby.js"></script>
+  <script src="/js/views/room.js"></script>
+  <script src="/js/views/game.js"></script>
+  <script src="/js/views/voting.js"></script>
+  <script src="/js/views/scoreboard.js"></script>
+  <script src="/js/views/invite.js"></script>
+  <script src="/js/views/profile.js"></script>
+  <script src="/js/views/privacy.js"></script>
+  <script src="/js/views/contact.js"></script>
+  <script src="/js/views/error.js"></script>
+  <script src="/js/views/leaderboard.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

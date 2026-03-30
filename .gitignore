@@ -1,0 +1,23 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.env.test
+client/css/output.css
+logs/
+*.log
+pgdata*/
+.DS_Store
+coverage/
+
+# AI agent config (private)
+.cursorrules
+AGENTS.md
+CLAUDE.md
+MEMORY.md
+server.md
+.agents/
+
+# Security
+*.pem
+*.key

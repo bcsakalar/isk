@@ -1,0 +1,7 @@
+# ======================================================
+# BU DOSYA KULLANILMIYOR — KULLANMAYIN!
+# ======================================================
+# Development:  docker compose -f docker-compose.dev.yml up --build
+# Production:   docker compose -f docker-compose.prod.yml up -d --build
+# ======================================================
+# Detaylar için: server.md dosyasına bakın.

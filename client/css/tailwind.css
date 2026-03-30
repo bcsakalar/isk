@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Mono&display=swap');
+
+@layer base {
+  body {
+    @apply bg-retro-bg text-retro-text font-retro min-h-screen;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #e94560 #16213e;
+  }
+
+  *::-webkit-scrollbar { width: 8px; }
+  *::-webkit-scrollbar-track { background: #16213e; }
+  *::-webkit-scrollbar-thumb { background: #e94560; border-radius: 4px; }
+}
+
+@layer components {
+  .btn-retro {
+    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-accent
+           bg-retro-accent text-white rounded cursor-pointer
+           hover:bg-retro-accent/80 active:scale-95
+           transition-all duration-150 uppercase tracking-wider
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-retro-outline {
+    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-accent
+           bg-transparent text-retro-accent rounded cursor-pointer
+           hover:bg-retro-accent hover:text-white
+           transition-all duration-150 uppercase tracking-wider;
+  }
+
+  .btn-retro-secondary {
+    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-gold
+           bg-retro-gold text-retro-bg rounded cursor-pointer
+           hover:bg-retro-gold/80 active:scale-95
+           transition-all duration-150 uppercase tracking-wider;
+  }
+
+  .card-retro {
+    @apply bg-retro-surface border-2 border-retro-accent/30 rounded-lg
+           p-6 shadow-lg shadow-retro-accent/10;
+  }
+
+  .input-retro {
+    @apply w-full px-4 py-3 bg-retro-bg border-2 border-retro-accent/40
+           rounded text-retro-text font-vt323 text-lg
+           focus:border-retro-accent focus:outline-none focus:ring-1
+           focus:ring-retro-accent placeholder-retro-text/40
+           transition-colors duration-200;
+  }
+
+  .badge-retro {
+    @apply inline-flex items-center px-2 py-1 text-xs font-pixel
+           rounded border border-retro-accent/50 bg-retro-accent/20 text-retro-accent;
+  }
+
+  .pixel-border {
+    box-shadow: 
+      inset -4px -4px 0px 0px #16213e,
+      inset 4px 4px 0px 0px rgba(255,255,255,0.1);
+  }
+
+  .toast {
+    @apply p-4 rounded-lg border-2 font-vt323 text-lg
+           shadow-xl animate-bounce-in;
+  }
+
+  .toast-success { @apply bg-retro-green/90 border-retro-green text-white; }
+  .toast-error { @apply bg-retro-accent/90 border-retro-accent text-white; }
+  .toast-info { @apply bg-retro-purple/90 border-retro-purple text-white; }
+  .toast-warn { @apply bg-retro-gold/90 border-retro-gold text-retro-bg; }
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/70 flex items-center justify-center z-40;
+  }
+
+  .modal-content {
+    @apply card-retro max-w-md w-full mx-4 animate-bounce-in;
+  }
+
+  .timer-bar {
+    @apply h-2 bg-retro-accent/30 rounded-full overflow-hidden;
+  }
+
+  .timer-bar-fill {
+    @apply h-full bg-retro-accent rounded-full transition-all duration-1000 ease-linear;
+  }
+
+  .timer-bar-fill.warning { @apply bg-retro-gold; }
+  .timer-bar-fill.danger { @apply bg-red-500 animate-pulse; }
+
+  .player-avatar {
+    @apply w-10 h-10 rounded-full border-2 border-retro-accent
+           flex items-center justify-center font-pixel text-sm bg-retro-surface;
+  }
+
+  .category-tag {
+    @apply px-3 py-1 text-sm font-mono rounded-full
+           border border-retro-purple/50 bg-retro-purple/20 text-retro-purple;
+  }
+
+  .leaderboard-row {
+    @apply flex items-center justify-between p-3 rounded
+           border border-retro-accent/20 bg-retro-surface/50
+           hover:bg-retro-accent/10 transition-colors;
+  }
+
+  .score-pop {
+    @apply font-pixel text-retro-accent animate-score-pop;
+  }
+
+  /* Tooltip */
+  .tooltip-trigger {
+    @apply cursor-help relative inline-block;
+  }
+  .tooltip-trigger:hover::after {
+    content: attr(data-tip);
+    @apply absolute z-50 left-1/2 bottom-full mb-2 px-3 py-2
+           text-xs font-vt323 text-retro-text bg-retro-surface
+           border border-retro-accent/40 rounded shadow-lg
+           whitespace-normal w-52 -translate-x-1/2;
+  }
+}
