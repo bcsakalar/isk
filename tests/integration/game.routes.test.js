@@ -27,7 +27,7 @@ beforeEach(() => {
 
 describe('GET /api/game/categories (public)', () => {
   it('kategorileri auth olmadan getir → 200', async () => {
-    gamesQueries.getAllCategories.mockResolvedValue([
+    gamesQueries.getDefaultCategories.mockResolvedValue([
       { id: 1, name: 'İsim' }, { id: 2, name: 'Şehir' },
     ]);
 
