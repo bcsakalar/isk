@@ -83,20 +83,25 @@ prod    → Node.js 20-alpine, sadece production deps + built assets, non-root u
 
 ## VPS Nginx Kurulumu
 
+> **NOT**: Nginx config dosyaları güvenlik nedeniyle repoda bulunmaz. VPS'te doğrudan oluşturulur.
+> Detaylı kurulum ve config içeriği için bkz: `server.md` → Bölüm 8.
+
 ```bash
-# Config dosyalarını kopyala
-sudo cp /opt/katmanisimsehir/nginx/isk.conf /etc/nginx/sites-available/
-sudo cp /opt/katmanisimsehir/nginx/security.conf /etc/nginx/snippets/
+# Varsayılan siteyi kaldır
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Site config'i oluştur (içeriği server.md Bölüm 8B'den kopyala)
+sudo nano /etc/nginx/sites-available/isk.conf
 
 # Aktifleştir
-sudo ln -s /etc/nginx/sites-available/isk.conf /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/isk.conf /etc/nginx/sites-enabled/isk.conf
 
 # Test et ve yükle
 sudo nginx -t
 sudo systemctl reload nginx
 
 # SSL sertifikası (Let's Encrypt)
-sudo certbot --nginx -d isimsehir.example.com
+sudo certbot --nginx -d demoishsite.com
 ```
 
 ## Docker Olmadan Lokal Çalıştırma

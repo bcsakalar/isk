@@ -21,3 +21,6 @@ server.md
 # Security
 *.pem
 *.key
+
+# Nginx (VPS-specific config — domain, SSL paths)
+nginx/
