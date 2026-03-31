@@ -52,7 +52,7 @@ function roomHandler(io, socket) {
       if (!player) return;
 
       const room = await roomsQueries.findById(roomId);
-      if (!room || !['waiting', 'playing'].includes(room.status)) return;
+      if (!room || !['waiting', 'playing', 'finished'].includes(room.status)) return;
 
       const roomKey = `room:${roomId}`;
       socket.join(roomKey);
@@ -335,11 +335,14 @@ function roomHandler(io, socket) {
       clearPendingDisconnect(userId);
 
       const room = await roomsQueries.findById(roomId);
-      if (!room || !['waiting', 'playing'].includes(room.status)) {
+      if (!room || !['waiting', 'playing', 'finished'].includes(room.status)) {
         // Oda aktif değilse direkt çıkar
         await roomService.leaveRoom({ userId, roomId });
         return;
       }
+
+      // Bitmiş odalarda oyuncuyu çıkarma — skorboard erişimi için kalmalı
+      if (room.status === 'finished') return;
 
       // Grace period süresi belirle
       const gracePeriod = room.status === 'playing'

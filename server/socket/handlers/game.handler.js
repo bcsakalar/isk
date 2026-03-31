@@ -6,6 +6,7 @@ const logger = require('../../utils/logger');
 // Oda bazında zamanlayıcılar
 const roomTimers = new Map(); // roomId -> { timer, remaining, duration }
 const votingTimers = new Map(); // roomId -> { timer, remaining }
+const votingEndInProgress = new Set(); // roomId — race condition önleme
 
 function gameHandler(io, socket) {
   // Oyunu başlat
@@ -140,15 +141,23 @@ function gameHandler(io, socket) {
 
       clearVotingTimer(socket.currentRoom);
 
-      const { result, isGameOver, roundId } = await gameService.endVotingPhase(socket.currentRoom);
-      const roomKey = `room:${socket.currentRoom}`;
+      // Race condition: timer ile aynı anda çağrılmasını önle
+      if (votingEndInProgress.has(socket.currentRoom)) return;
+      votingEndInProgress.add(socket.currentRoom);
 
-      io.to(roomKey).emit('game:voting_ended', {
-        players: result.players,
-        detailedAnswers: result.detailedAnswers,
-        roundId,
-        isGameOver,
-      });
+      try {
+        const { result, isGameOver, roundId } = await gameService.endVotingPhase(socket.currentRoom);
+        const roomKey = `room:${socket.currentRoom}`;
+
+        io.to(roomKey).emit('game:voting_ended', {
+          players: result.players,
+          detailedAnswers: result.detailedAnswers,
+          roundId,
+          isGameOver,
+        });
+      } finally {
+        votingEndInProgress.delete(socket.currentRoom);
+      }
     } catch (err) {
       socket.emit('game:error', { message: err.message });
     }
@@ -243,13 +252,19 @@ function startRoundTimer(io, roomId, durationSeconds) {
           const round = await gameService.endRound(roomId);
           if (!round) return;
 
-          // Cevapları al
+          // Cevapları ve oy sayılarını al (boş cevaplar için otomatik oylar dahil)
           const detailedAnswers = await gamesQueries.getDetailedAnswersForRound(round.id);
+          const voteCountsArr = await gamesQueries.getVoteCountsForRound(round.id);
+          const voteCounts = {};
+          for (const vc of voteCountsArr) {
+            voteCounts[vc.answer_id] = { positive: vc.positive, negative: vc.negative };
+          }
 
           io.to(roomKey).emit('game:round_ended', {
             timedOut: true,
             detailedAnswers,
             roundId: round.id,
+            voteCounts,
           });
 
           // Oylama fazını başlat
@@ -304,6 +319,11 @@ function startVotingTimer(io, roomId, durationSeconds, roundId) {
 
     if (remaining <= 0) {
       clearVotingTimer(roomId);
+
+      // Race condition: manuel end_voting ile aynı anda çağrılmasını önle
+      if (votingEndInProgress.has(roomId)) return;
+      votingEndInProgress.add(roomId);
+
       // Oylama bitti → skorları hesapla
       try {
         const { result, isGameOver, roundId: rId } = await gameService.endVotingPhase(roomId);
@@ -316,6 +336,8 @@ function startVotingTimer(io, roomId, durationSeconds, roundId) {
         });
       } catch (err) {
         logger.error('Voting finalization error', { error: err.message, roomId });
+      } finally {
+        votingEndInProgress.delete(roomId);
       }
       return;
     }

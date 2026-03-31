@@ -140,6 +140,26 @@ const gameService = {
     // Duplicate tespiti ve ön-puanlama yap (batch)
     await scoringService.prepareRoundForVoting(round.id, round.letter);
 
+    // Boş cevaplara otomatik olumsuz oy ekle (tüm diğer oyunculardan)
+    const allAnswersAfterPrep = await gamesQueries.getAnswersForRound(round.id);
+    const emptyAnswers = allAnswersAfterPrep.filter(a => !a.answer || a.answer.trim() === '');
+    if (emptyAnswers.length > 0) {
+      const autoVoteEntries = [];
+      for (const emptyAns of emptyAnswers) {
+        for (const player of players) {
+          if (player.id !== emptyAns.player_id) {
+            autoVoteEntries.push({ answerId: emptyAns.id, voterId: player.id });
+          }
+        }
+      }
+      if (autoVoteEntries.length > 0) {
+        await gamesQueries.addAutoNegativeVotesBatch(autoVoteEntries);
+        logger.info('Auto-negative votes inserted for empty answers', {
+          roomId, roundId: round.id, emptyCount: emptyAnswers.length, voteCount: autoVoteEntries.length,
+        });
+      }
+    }
+
     // Oylama başlangıcını kaydet
     await gamesQueries.setVotingStarted(round.id);
 
@@ -333,8 +353,10 @@ const gameService = {
     const room = await roomsQueries.findByCode(code);
     if (!room) throw new NotFoundError('Oda bulunamadı');
 
-    // Oyuncu bu odada mı kontrol et
-    const player = await roomsQueries.getPlayerByRoomAndUser(room.id, userId);
+    // Oyuncu bu odada mı kontrol et (bitmiş odalarda left_at set olmuş olabilir)
+    const player = room.status === 'finished'
+      ? await roomsQueries.getPlayerByRoomAndUserIncludeLeft(room.id, userId)
+      : await roomsQueries.getPlayerByRoomAndUser(room.id, userId);
     if (!player) throw new ForbiddenError('Bu odada değilsiniz');
 
     const players = await roomsQueries.getPlayers(room.id);

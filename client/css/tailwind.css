@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Press+Start+2P&display=swap');
 
 @layer base {
   body {
@@ -115,7 +115,6 @@
     @apply font-pixel text-retro-accent animate-score-pop;
   }
 
-  /* Tooltip */
   .tooltip-trigger {
     @apply cursor-help relative inline-block;
   }
@@ -126,4 +125,30 @@
            border border-retro-accent/40 rounded shadow-lg
            whitespace-normal w-52 -translate-x-1/2;
   }
+
+  /* Vote boxes (oylama kutucukları) */
+  .vote-box {
+    @apply transition-all duration-300;
+  }
+  .vote-box-pop {
+    animation: voteBoxPop 0.3s ease-out;
+  }
+
+  /* Category drag & drop */
+  .cat-chip.opacity-40 {
+    opacity: 0.4;
+  }
+  .cat-chip.scale-95 {
+    transform: scale(0.95);
+  }
+  .ring-offset-1 {
+    --tw-ring-offset-width: 2px;
+    --tw-ring-offset-color: #1a1a2e;
+  }
+}
+
+@keyframes voteBoxPop {
+  0% { transform: scale(0.5); opacity: 0.3; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
 }

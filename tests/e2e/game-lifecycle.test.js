@@ -431,6 +431,7 @@ describe('Game Lifecycle — E2E Socket Tests', () => {
       // endRound, getDetailedAnswersForRound, findById gerekli mock'lar
       gameService.endRound.mockResolvedValue(mockRound);
       gamesQueries.getDetailedAnswersForRound.mockResolvedValue([]);
+      gamesQueries.getVoteCountsForRound.mockResolvedValue([]);
       roomsQueries.findById.mockResolvedValue({ ...mockRoom, voting_timer: 0 });
 
       const startedPromises = players.map(p => p.waitFor('game:started', 3000));

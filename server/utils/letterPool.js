@@ -1,10 +1,9 @@
-// Türkçe harf havuzu — Q, W, X hariç
-// Nadir harfler (Ğ, Ü, Ö, Ş, Ç, İ) opsiyonel olarak devre dışı bırakılabilir
+// Türkçe harf havuzu — Q, W, X, Ğ hariç (Ğ ile başlayan kelime yok denecek kadar az)
 const TURKISH_LETTERS = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
   'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
   'R', 'S', 'T', 'U', 'V', 'Y', 'Z',
-  'Ç', 'Ğ', 'İ', 'Ö', 'Ş', 'Ü'
+  'Ç', 'İ', 'Ö', 'Ş', 'Ü'
 ];
 
 const EASY_LETTERS = [
@@ -13,7 +12,7 @@ const EASY_LETTERS = [
   'R', 'S', 'T', 'U', 'Y', 'Z'
 ];
 
-const HARD_LETTERS = ['Ç', 'Ğ', 'İ', 'J', 'Ö', 'Ş', 'Ü', 'V'];
+const HARD_LETTERS = ['Ç', 'İ', 'J', 'Ö', 'Ş', 'Ü', 'V'];
 
 /**
  * @param {string[]} usedLetters - Daha önce kullanılan harfler

@@ -65,8 +65,10 @@ const gamesQueries = {
        JOIN room_players rp ON rp.id = pa.player_id
        JOIN users u ON u.id = rp.user_id
        JOIN categories c ON c.id = pa.category_id
+       JOIN game_rounds gr ON gr.id = pa.round_id
+       JOIN room_categories rc ON rc.room_id = gr.room_id AND rc.category_id = pa.category_id
        WHERE pa.round_id = $1
-       ORDER BY rp.user_id, c.id`,
+       ORDER BY rc.sort_order, rp.user_id`,
       [roundId]
     );
     return result.rows;
@@ -250,8 +252,10 @@ const gamesQueries = {
        JOIN room_players rp ON rp.id = pa.player_id
        JOIN users u ON u.id = rp.user_id
        JOIN categories c ON c.id = pa.category_id
+       JOIN game_rounds gr ON gr.id = pa.round_id
+       JOIN room_categories rc ON rc.room_id = gr.room_id AND rc.category_id = pa.category_id
        WHERE pa.round_id = $1
-       ORDER BY c.id, rp.user_id`,
+       ORDER BY rc.sort_order, rp.user_id`,
       [roundId]
     );
     return result.rows;
@@ -390,6 +394,32 @@ const gamesQueries = {
       `INSERT INTO player_answers (round_id, player_id, category_id, answer)
        VALUES ${values.join(', ')}
        ON CONFLICT (round_id, player_id, category_id) DO NOTHING`,
+      params
+    );
+  },
+
+  /**
+   * Boş cevaplara otomatik olumsuz oy ekle (batch).
+   * entries = [{ answerId, voterId }, ...]
+   * ON CONFLICT DO NOTHING: mevcut oyları ezmez.
+   */
+  async addAutoNegativeVotesBatch(entries) {
+    if (!entries.length) return;
+
+    const values = [];
+    const params = [];
+    let paramIdx = 1;
+
+    for (const entry of entries) {
+      values.push(`($${paramIdx}, $${paramIdx + 1}, 'negative')`);
+      params.push(entry.answerId, entry.voterId);
+      paramIdx += 2;
+    }
+
+    await query(
+      `INSERT INTO answer_votes (answer_id, voter_id, vote_type)
+       VALUES ${values.join(', ')}
+       ON CONFLICT (answer_id, voter_id) DO NOTHING`,
       params
     );
   },

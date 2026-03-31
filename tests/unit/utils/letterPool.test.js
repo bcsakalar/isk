@@ -1,26 +1,27 @@
 const { TURKISH_LETTERS, EASY_LETTERS, HARD_LETTERS, pickRandomLetter } = require('../../../server/utils/letterPool');
 
 describe('letterPool sabitleri', () => {
-  it('TURKISH_LETTERS 29 harf içermeli', () => {
-    expect(TURKISH_LETTERS).toHaveLength(29);
+  it('TURKISH_LETTERS 28 harf içermeli', () => {
+    expect(TURKISH_LETTERS).toHaveLength(28);
   });
 
   it('EASY_LETTERS 21 harf içermeli', () => {
     expect(EASY_LETTERS).toHaveLength(21);
   });
 
-  it('HARD_LETTERS 8 harf içermeli', () => {
-    expect(HARD_LETTERS).toHaveLength(8);
+  it('HARD_LETTERS 7 harf içermeli', () => {
+    expect(HARD_LETTERS).toHaveLength(7);
   });
 
-  it('Q, W, X harflerini içermemeli', () => {
+  it('Q, W, X, Ğ harflerini içermemeli', () => {
     expect(TURKISH_LETTERS).not.toContain('Q');
     expect(TURKISH_LETTERS).not.toContain('W');
     expect(TURKISH_LETTERS).not.toContain('X');
+    expect(TURKISH_LETTERS).not.toContain('Ğ');
   });
 
   it('Türkçe özel harfleri içermeli', () => {
-    for (const letter of ['Ç', 'Ğ', 'İ', 'Ö', 'Ş', 'Ü']) {
+    for (const letter of ['Ç', 'İ', 'Ö', 'Ş', 'Ü']) {
       expect(TURKISH_LETTERS).toContain(letter);
     }
   });

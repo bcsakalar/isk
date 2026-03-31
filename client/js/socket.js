@@ -126,5 +126,9 @@ const SocketClient = (() => {
     }
   }
 
-  return { connect, disconnect, send, on, off };
+  function isConnected() {
+    return !!(socket && socket.connected && socket.id);
+  }
+
+  return { connect, disconnect, send, on, off, isConnected };
 })();

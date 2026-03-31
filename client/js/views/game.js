@@ -243,10 +243,11 @@ function GameView(container, { params }) {
     });
 
     // Tur bitti → oylama fazına geçiş
-    const unsub3 = SocketClient.on('game:round_ended', ({ detailedAnswers, roundId }) => {
+    const unsub3 = SocketClient.on('game:round_ended', ({ detailedAnswers, roundId, voteCounts }) => {
       Store.set('detailedAnswers', detailedAnswers || []);
       Store.set('currentRoundId', roundId);
       Store.set('gameState', 'voting');
+      if (voteCounts) Store.set('voteCounts', voteCounts);
       // Oylama ekranına yönlendir
       Router.navigate(`/voting/${code}`);
     });

@@ -138,6 +138,51 @@ describe('Room Lifecycle — E2E Socket Tests', () => {
       const result = await player.emitAndWait('room:join', { code: 'PVT001', password: 'dogru123' }, 'room:joined');
       expect(result.room.code).toBe('PVT001');
     });
+
+    it('yanlış şifre sonrası aynı socket ile doğru şifre ile katılım başarılı', async () => {
+      const player = await createPlayerClient(port, { id: 202 });
+      players.push(player);
+
+      // 1) İlk deneme: yanlış şifre → room:error
+      roomService.joinRoom.mockRejectedValueOnce(new Error('Oda şifresi yanlış'));
+
+      const errorPromise = player.waitFor('room:error', 3000);
+      player.socket.emit('room:join', { code: 'PVT001', password: 'yanlis' });
+      const error = await errorPromise;
+      expect(error.message).toContain('Oda şifresi yanlış');
+
+      // 2) İkinci deneme: doğru şifre → room:joined
+      const mockRoom = { id: 2, code: 'PVT001', name: 'Özel Oda', owner_id: 999, status: 'waiting', is_private: true };
+      roomService.joinRoom.mockResolvedValueOnce({ room: mockRoom, player: { id: 1, user_id: 202 }, alreadyJoined: false });
+      roomService.getRoom.mockResolvedValueOnce({ ...mockRoom, players: [{ id: 1, user_id: 202 }], categories: [] });
+
+      const result = await player.emitAndWait('room:join', { code: 'PVT001', password: 'dogru123' }, 'room:joined');
+      expect(result.room.code).toBe('PVT001');
+      expect(roomService.joinRoom).toHaveBeenCalledTimes(2);
+    });
+
+    it('birden fazla yanlış şifre sonrası doğru şifre ile katılım başarılı', async () => {
+      const player = await createPlayerClient(port, { id: 203 });
+      players.push(player);
+
+      // 3 yanlış deneme
+      for (let i = 0; i < 3; i++) {
+        roomService.joinRoom.mockRejectedValueOnce(new Error('Oda şifresi yanlış'));
+        const errPromise = player.waitFor('room:error', 3000);
+        player.socket.emit('room:join', { code: 'PVT001', password: `yanlis_${i}` });
+        const err = await errPromise;
+        expect(err.message).toContain('Oda şifresi yanlış');
+      }
+
+      // Doğru şifre ile katılım
+      const mockRoom = { id: 2, code: 'PVT001', name: 'Özel Oda', owner_id: 999, status: 'waiting', is_private: true };
+      roomService.joinRoom.mockResolvedValueOnce({ room: mockRoom, player: { id: 1, user_id: 203 }, alreadyJoined: false });
+      roomService.getRoom.mockResolvedValueOnce({ ...mockRoom, players: [{ id: 1, user_id: 203 }], categories: [] });
+
+      const result = await player.emitAndWait('room:join', { code: 'PVT001', password: 'dogru123' }, 'room:joined');
+      expect(result.room.code).toBe('PVT001');
+      expect(roomService.joinRoom).toHaveBeenCalledTimes(4);
+    });
   });
 
   // ─── 3. Oda Ayarları Senkronizasyonu (8 oyuncu) ────────────

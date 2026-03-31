@@ -172,13 +172,42 @@ describe('Reconnection — Disconnect Grace Period', () => {
   });
 
   // ─── 4. Aktif olmayan odada disconnect — direkt çıkış ──────
-  it('finished/abandoned odada direkt leaveRoom çağırmalı', async () => {
+  it('abandoned odada direkt leaveRoom çağırmalı', async () => {
     const players = [];
     try {
       const owner = await createPlayerClient(port, { id: 400, username: 'owner4' });
       players.push(owner);
 
-      const finishedRoom = { ...mockRoom, id: 2, status: 'finished' };
+      const abandonedRoom = { ...mockRoom, id: 2, status: 'abandoned' };
+      roomService.joinRoom.mockResolvedValue({ room: abandonedRoom, player: mockPlayers[0], alreadyJoined: false });
+      roomService.getRoom.mockResolvedValue({ ...abandonedRoom, players: mockPlayers, categories: [] });
+
+      await owner.emitAndWait('room:join', { code: 'ABC123' }, 'room:joined');
+
+      // Disconnect sırasında abandoned oda durumu
+      roomsQueries.findById.mockResolvedValue(abandonedRoom);
+      roomService.leaveRoom.mockResolvedValue({ abandoned: false });
+
+      owner.disconnect();
+
+      // Grace period olmadan direkt leaveRoom çağrılmalı
+      await new Promise(r => setTimeout(r, 500));
+      expect(roomService.leaveRoom).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 400, roomId: 2 })
+      );
+    } finally {
+      disconnectAll(players);
+    }
+  });
+
+  // ─── 5. Finished odada disconnect — grace period ile çıkış ──────
+  it('finished odada grace period uygulamalı (skor tablosunu görebilsin)', async () => {
+    const players = [];
+    try {
+      const owner = await createPlayerClient(port, { id: 500, username: 'owner5' });
+      players.push(owner);
+
+      const finishedRoom = { ...mockRoom, id: 3, status: 'finished' };
       roomService.joinRoom.mockResolvedValue({ room: finishedRoom, player: mockPlayers[0], alreadyJoined: false });
       roomService.getRoom.mockResolvedValue({ ...finishedRoom, players: mockPlayers, categories: [] });
 
@@ -190,11 +219,9 @@ describe('Reconnection — Disconnect Grace Period', () => {
 
       owner.disconnect();
 
-      // Grace period olmadan direkt leaveRoom çağrılmalı
+      // Finished odada direkt leaveRoom çağrılmamalı — grace period uygulanmalı
       await new Promise(r => setTimeout(r, 500));
-      expect(roomService.leaveRoom).toHaveBeenCalledWith(
-        expect.objectContaining({ userId: 400, roomId: 2 })
-      );
+      expect(roomService.leaveRoom).not.toHaveBeenCalled();
     } finally {
       disconnectAll(players);
     }

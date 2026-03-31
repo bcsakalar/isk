@@ -15,7 +15,7 @@ RUN chmod +x docker-entrypoint.sh
 # ============================================================
 FROM base AS development
 ENV NODE_ENV=development
-RUN npm install
+RUN npm install --no-update-notifier
 COPY . .
 RUN mkdir -p logs && chown -R iskuser:nodejs logs
 USER iskuser
@@ -26,7 +26,7 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 # Stage 3: build — tailwind CSS derlemesi (production için)
 # ============================================================
 FROM base AS build
-RUN npm install
+RUN npm install --no-update-notifier
 COPY . .
 RUN npx tailwindcss -i ./client/css/tailwind.css -o ./client/css/output.css --minify
 
@@ -35,7 +35,7 @@ RUN npx tailwindcss -i ./client/css/tailwind.css -o ./client/css/output.css --mi
 # ============================================================
 FROM base AS production
 ENV NODE_ENV=production
-RUN npm ci --omit=dev && npm cache clean --force && \
+RUN npm ci --omit=dev --no-update-notifier && npm cache clean --force && \
     rm -rf /tmp/* /root/.npm
 COPY --from=build /usr/src/app/server ./server/
 COPY --from=build /usr/src/app/client ./client/

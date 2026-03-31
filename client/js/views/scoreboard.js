@@ -113,8 +113,16 @@ function ScoreboardView(container, { params }) {
     // Event listeners
     const backRoomBtn = document.getElementById('btn-back-room');
     if (backRoomBtn) backRoomBtn.addEventListener('click', () => {
+      backRoomBtn.disabled = true;
+      backRoomBtn.textContent = 'BEKLENİYOR...';
       SocketClient.send('room:reset_for_new_game');
-      Router.navigate(`/room/${code}`);
+      // room:reset event'i setupSocketEvents'te yakalanıp navigate edilecek
+      // Fallback: 5 saniye içinde cevap gelmezse yine de navigate et
+      setTimeout(() => {
+        if (document.getElementById('btn-back-room')) {
+          Router.navigate(`/room/${code}`);
+        }
+      }, 5000);
     });
 
     const backBtn = document.getElementById('btn-back-lobby');
@@ -151,15 +159,15 @@ function ScoreboardView(container, { params }) {
       return;
     }
 
-    // Group by category
-    const catMap = {};
+    // Group by category (Map preserves insertion order from server's sort_order)
+    const catMap = new Map();
     for (const ans of detailedAnswers) {
       const key = ans.category_id;
-      if (!catMap[key]) catMap[key] = { name: ans.category_name, answers: [] };
-      catMap[key].answers.push(ans);
+      if (!catMap.has(key)) catMap.set(key, { name: ans.category_name, answers: [] });
+      catMap.get(key).answers.push(ans);
     }
 
-    el.innerHTML = Object.values(catMap).map(cat => {
+    el.innerHTML = [...catMap.values()].map(cat => {
       return `
       <div class="border border-retro-accent/20 rounded p-3">
         <div class="mb-2">
@@ -236,7 +244,6 @@ function ScoreboardView(container, { params }) {
   return {
     destroy() {
       unsubscribers.forEach(u => u());
-      Store.set('gameState', 'idle');
     },
   };
 }

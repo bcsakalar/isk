@@ -3,6 +3,8 @@ function InviteView(container, { params }) {
   const code = params.code;
   let roomData = null;
   let pollInterval = null;
+  let destroyed = false;
+  let joinCleanup = null;
 
   function formatVotingTimer(val) {
     return val ? val + 's' : 'Süresiz';
@@ -27,7 +29,7 @@ function InviteView(container, { params }) {
 
       // Oda artık aktif değilse
       if (roomData.status === 'abandoned' || roomData.status === 'finished') {
-        renderInactive();
+        handleInactiveRoom();
         return;
       }
 
@@ -49,8 +51,37 @@ function InviteView(container, { params }) {
     }
   }
 
-  function renderInactive() {
+  function handleInactiveRoom() {
     stopPolling();
+    const user = Store.get('user');
+
+    // Oyun bittiyse ve kullanıcı giriş yapmışsa → scoreboard'a yönlendir
+    if (roomData.status === 'finished' && user) {
+      Router.navigate(`/scoreboard/${code}`);
+      return;
+    }
+
+    // Oyun bittiyse ama giriş yapılmamışsa → bilgilendirici mesaj
+    if (roomData.status === 'finished' && !user) {
+      container.innerHTML = `
+        <div class="max-w-md mx-auto mt-12 space-y-6">
+          <div class="text-center">
+            <h1 class="font-pixel text-retro-accent text-lg mb-2">DAVET</h1>
+          </div>
+          <div class="card-retro p-6 text-center space-y-4">
+            <div class="text-4xl mb-2">🏁</div>
+            <h2 class="font-pixel text-retro-gold text-sm">OYUN TAMAMLANDI</h2>
+            <p class="font-vt323 text-retro-text/50">Bu odadaki oyun sona erdi.</p>
+            <button class="btn-retro" id="btn-go-home">ANA SAYFAYA DÖN</button>
+          </div>
+        </div>
+      `;
+      const homeBtn = document.getElementById('btn-go-home');
+      if (homeBtn) homeBtn.addEventListener('click', () => Router.navigate('/'));
+      return;
+    }
+
+    // Abandoned veya diğer durumlar
     container.innerHTML = `
       <div class="max-w-md mx-auto mt-12 space-y-6">
         <div class="text-center">
@@ -59,7 +90,7 @@ function InviteView(container, { params }) {
         <div class="card-retro p-6 text-center space-y-4">
           <div class="text-4xl mb-2">🚫</div>
           <h2 class="font-pixel text-red-400 text-sm">ODA ARTIK AKTİF DEĞİL</h2>
-          <p class="font-vt323 text-retro-text/50">Bu oda ${roomData.status === 'finished' ? 'oyun tamamlandığı için' : ''} kapatılmış.</p>
+          <p class="font-vt323 text-retro-text/50">Bu oda kapatılmış.</p>
           <button class="btn-retro" id="btn-go-home">ANA SAYFAYA DÖN</button>
         </div>
       </div>
@@ -77,7 +108,7 @@ function InviteView(container, { params }) {
         // Oda kapandıysa
         if (newData.status === 'abandoned' || newData.status === 'finished') {
           roomData = newData;
-          renderInactive();
+          handleInactiveRoom();
           return;
         }
 
@@ -290,15 +321,46 @@ function InviteView(container, { params }) {
     if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Bekle...'; }
 
     try {
+      // Zaten giriş yapmış mı? (önceki denemede misafir oluşturulmuş olabilir)
+      if (Store.get('user') && Store.get('token')) {
+        // Socket bağlıysa doğrudan odaya katıl
+        if (SocketClient.isConnected()) {
+          joinRoom();
+          return;
+        }
+        // Socket bağlı değilse tekrar bağlan
+        SocketClient.connect();
+        const connected = await waitForSocketConnection();
+        if (!connected) {
+          throw new Error('Sunucuya bağlanılamadı, tekrar deneyin');
+        }
+        await new Promise(resolve => setTimeout(resolve, 150));
+        joinRoom();
+        return;
+      }
+
+      // 1) Misafir kullanıcı oluştur
       const res = await Api.post('/auth/guest', { nickname });
       Store.saveAuth(res.data.user, res.data.accessToken);
+
+      // 2) Socket bağlantısını başlat
       SocketClient.connect();
 
-      // Socket bağlantısını bekle
+      // 3) Socket bağlantısını bekle
       const connected = await waitForSocketConnection();
       if (!connected) {
         throw new Error('Sunucuya bağlanılamadı, tekrar deneyin');
       }
+
+      // 4) Socket handler'larının sunucuda tamamen bağlanması için kısa bekleme
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // 5) Son kontrol — socket hâlâ bağlı mı?
+      if (!SocketClient.isConnected()) {
+        throw new Error('Bağlantı koptu, tekrar deneyin');
+      }
+
+      // 6) Odaya katıl
       joinRoom();
     } catch (err) {
       if (errEl) { errEl.textContent = err.message || 'Misafir girişi başarısız'; errEl.classList.remove('hidden'); }
@@ -308,6 +370,11 @@ function InviteView(container, { params }) {
 
   function waitForSocketConnection() {
     return new Promise((resolve) => {
+      // Socket zaten bağlıysa anında resolve et
+      if (SocketClient.isConnected()) {
+        resolve(true);
+        return;
+      }
       const unsub = SocketClient.on('_connected', () => {
         unsub();
         clearTimeout(timer);
@@ -321,44 +388,78 @@ function InviteView(container, { params }) {
   }
 
   function joinRoom() {
+    if (destroyed) return;
     const password = document.getElementById('invite-password')?.value || '';
 
     // Her iki buton türünü de bul (logged-in vs guest)
     const joinBtn = document.getElementById('btn-join-room');
     const guestBtn = document.getElementById('btn-guest-confirm');
-    const activeBtn = joinBtn || guestBtn;
 
     if (joinBtn) { joinBtn.disabled = true; joinBtn.textContent = 'KATILINIYOR...'; }
     if (guestBtn) { guestBtn.disabled = true; guestBtn.textContent = 'KATILINIYOR...'; }
 
-    SocketClient.send('room:join', { code, password });
+    // Önceki join denemesini temizle
+    if (joinCleanup) { joinCleanup(); joinCleanup = null; }
 
     let unsub1, unsub2, joinTimeout;
+    let retried = false;
 
     function cleanup() {
       if (unsub1) unsub1();
       if (unsub2) unsub2();
       clearTimeout(joinTimeout);
+      joinCleanup = null;
+    }
+
+    // View destroy edildiğinde temizlenebilsin
+    joinCleanup = cleanup;
+
+    function attemptJoin() {
+      SocketClient.send('room:join', { code, password });
     }
 
     unsub1 = SocketClient.on('room:joined', () => {
       cleanup();
+      if (destroyed) return;
       stopPolling();
       Router.navigate(`/room/${code}`);
     });
 
     unsub2 = SocketClient.on('room:error', ({ message }) => {
       cleanup();
+      if (destroyed) return;
       Toast.error(message || 'Odaya katılınamadı');
-      resetJoinButton();
+      // Misafir olarak katılım sonrası hata aldıysa, artık kullanıcı giriş yapmış durumda.
+      // UI'ı yeniden render ederek doğru durumu göster (btn-join-room + şifre alanı)
+      if (Store.get('user')) {
+        renderInvite();
+      } else {
+        resetJoinButton();
+      }
     });
 
-    // 8 saniye timeout — sunucu yanıt vermezse
+    // İlk deneme
+    attemptJoin();
+
+    // 3 saniye içinde yanıt gelmezse otomatik retry (1 kez)
     joinTimeout = setTimeout(() => {
-      cleanup();
-      Toast.error('Sunucu yanıt vermedi, tekrar deneyin');
-      resetJoinButton();
-    }, 8000);
+      if (!retried && !destroyed) {
+        retried = true;
+        console.warn('[Invite] room:join yanıt gelmedi, tekrar deneniyor...');
+        attemptJoin();
+        // İkinci deneme için 5 saniye daha bekle
+        joinTimeout = setTimeout(() => {
+          cleanup();
+          if (destroyed) return;
+          Toast.error('Sunucu yanıt vermedi, tekrar deneyin');
+          if (Store.get('user')) {
+            renderInvite();
+          } else {
+            resetJoinButton();
+          }
+        }, 5000);
+      }
+    }, 3000);
   }
 
   function resetJoinButton() {
@@ -378,7 +479,9 @@ function InviteView(container, { params }) {
 
   return {
     destroy() {
+      destroyed = true;
       stopPolling();
+      if (joinCleanup) { joinCleanup(); joinCleanup = null; }
     },
   };
 }

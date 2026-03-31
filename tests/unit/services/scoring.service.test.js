@@ -182,4 +182,97 @@ describe('scoringService.calculateVoteScores', () => {
     expect(gamesQueries.batchUpdateAnswerScores).toHaveBeenCalled();
     expect(gamesQueries.batchAddScores).toHaveBeenCalled();
   });
+
+  it('boş/geçersiz cevaplar otomatik red oylarıyla negatif puan almalı', async () => {
+    gamesQueries.getAnswersForRound.mockResolvedValue([
+      getMockAnswer({ id: 30, player_id: 1, category_id: 1, answer: '', is_valid: false, is_unique: false, is_duplicate: false, base_score: 0 }),
+      getMockAnswer({ id: 31, player_id: 2, category_id: 1, answer: 'Ankara', is_valid: true, is_unique: true, is_duplicate: false, base_score: 0 }),
+    ]);
+    // Boş cevap (id:30) → diğer oyuncudan 1 otomatik negatif oy
+    gamesQueries.getVoteCountsForRound.mockResolvedValue([
+      { answer_id: 30, positive: 0, negative: 1 },
+      { answer_id: 31, positive: 1, negative: 0 },
+    ]);
+    gamesQueries.getDetailedAnswersForRound.mockResolvedValue([]);
+    roomsQueries.getPlayers.mockResolvedValue([
+      getMockRoomPlayer({ id: 1, user_id: 1, total_score: 0 }),
+      getMockRoomPlayer({ id: 2, user_id: 2, total_score: 0 }),
+    ]);
+
+    await scoringService.calculateVoteScores(1, 1);
+    // Boş cevap: 0 positive - 1 negative * 10 = -10
+    expect(gamesQueries.batchUpdateAnswerScores).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ answerId: 30, voteScore: -10, baseScore: -10 }),
+        expect.objectContaining({ answerId: 31, voteScore: 10, baseScore: 10 }),
+      ])
+    );
+  });
+
+  it('boş cevaplar çoklu otomatik red oyuyla daha büyük ceza almalı', async () => {
+    gamesQueries.getAnswersForRound.mockResolvedValue([
+      getMockAnswer({ id: 40, player_id: 1, category_id: 1, answer: '', is_valid: false, is_unique: false, is_duplicate: false, base_score: 0 }),
+    ]);
+    // 3 diğer oyuncudan otomatik negatif oy
+    gamesQueries.getVoteCountsForRound.mockResolvedValue([
+      { answer_id: 40, positive: 0, negative: 3 },
+    ]);
+    gamesQueries.getDetailedAnswersForRound.mockResolvedValue([]);
+    roomsQueries.getPlayers.mockResolvedValue([
+      getMockRoomPlayer({ id: 1, user_id: 1, total_score: 0 }),
+    ]);
+
+    await scoringService.calculateVoteScores(1, 1);
+    // 3 negatif × -10 = -30
+    expect(gamesQueries.batchUpdateAnswerScores).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ answerId: 40, voteScore: -30, baseScore: -30 }),
+      ])
+    );
+  });
+
+  it('geçersiz cevap negatif oy yoksa 0 kalmalı', async () => {
+    gamesQueries.getAnswersForRound.mockResolvedValue([
+      getMockAnswer({ id: 50, player_id: 1, category_id: 1, answer: 'Berlin', is_valid: false, is_unique: false, is_duplicate: false, base_score: 0 }),
+    ]);
+    // Yanlış harf cevabına hiç oy yok
+    gamesQueries.getVoteCountsForRound.mockResolvedValue([]);
+    gamesQueries.getDetailedAnswersForRound.mockResolvedValue([]);
+    roomsQueries.getPlayers.mockResolvedValue([
+      getMockRoomPlayer({ id: 1, user_id: 1, total_score: 0 }),
+    ]);
+
+    await scoringService.calculateVoteScores(1, 1);
+    expect(gamesQueries.batchUpdateAnswerScores).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ answerId: 50, baseScore: 0, voteScore: 0 }),
+      ])
+    );
+  });
+
+  it('boş cevap cezası playerScores toplamına yansımalı', async () => {
+    gamesQueries.getAnswersForRound.mockResolvedValue([
+      getMockAnswer({ id: 60, player_id: 1, category_id: 1, answer: '', is_valid: false, is_unique: false, is_duplicate: false, base_score: 0 }),
+      getMockAnswer({ id: 61, player_id: 1, category_id: 2, answer: '', is_valid: false, is_unique: false, is_duplicate: false, base_score: 0 }),
+    ]);
+    // Her iki boş cevaba da 1 negatif oy
+    gamesQueries.getVoteCountsForRound.mockResolvedValue([
+      { answer_id: 60, positive: 0, negative: 1 },
+      { answer_id: 61, positive: 0, negative: 1 },
+    ]);
+    gamesQueries.getDetailedAnswersForRound.mockResolvedValue([]);
+    roomsQueries.getPlayers.mockResolvedValue([
+      getMockRoomPlayer({ id: 1, user_id: 1, total_score: 0, username: 'test', display_name: 'Test' }),
+    ]);
+
+    const result = await scoringService.calculateVoteScores(1, 1);
+    // Player 1: -10 + -10 = -20 toplam tur puanı
+    expect(gamesQueries.batchAddScores).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ playerId: 1, score: -20 }),
+      ])
+    );
+    // result.players should reflect round_score
+    expect(result.players[0].round_score).toBe(-20);
+  });
 });

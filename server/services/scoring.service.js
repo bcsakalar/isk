@@ -96,9 +96,9 @@ const scoringService = {
 
   /**
    * Oylama sonuçlarını hesapla ve skorları güncelle.
-   * Unique cevaplar: olumlu oy +10, olumsuz oy -10 (min 0)
-   * Duplicate cevaplar: olumlu oy +5, olumsuz oy -10 (min 0)
-   * Boş/geçersiz cevaplar: 0
+   * Unique cevaplar: olumlu oy +10, olumsuz oy -10
+   * Duplicate cevaplar: olumlu oy +5, olumsuz oy -10
+   * Boş/geçersiz cevaplar: olumsuz oy -10 (otomatik red dahil)
    */
   async calculateVoteScores(roundId, roomId) {
     const voteCounts = await gamesQueries.getVoteCountsForRound(roundId);
@@ -124,6 +124,10 @@ const scoringService = {
       } else if (ans.is_valid && !ans.is_duplicate) {
         // Unique: olumlu oy +10, olumsuz oy -10
         voteScore = (votes.positive * 10) - (votes.negative * 10);
+        baseScore = voteScore;
+      } else if (!ans.is_valid && votes.negative > 0) {
+        // Boş/geçersiz cevap: otomatik red oyları → negatif puan
+        voteScore = -(votes.negative * 10);
         baseScore = voteScore;
       }
 

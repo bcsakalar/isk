@@ -4,6 +4,7 @@ function VotingView(container, { params }) {
   let chatComp = null;
   let currentCatIndex = 0;
   const revealedAnswers = new Set(); // açılmış cevap ID'leri
+  const revealConfirmDismissed = new Set(); // "Cevap gösterildi" yazısı gösterilip gizlenmiş ID'ler
   const answerImages = {}; // answerId -> [{ imageId, imageData }]
   let uploadingAnswers = new Set(); // şu an upload edilen cevaplar (çift tıklama önleme)
   const unsubscribers = [];
@@ -159,13 +160,15 @@ function VotingView(container, { params }) {
 
   function getCategories() {
     const detailedAnswers = Store.get('detailedAnswers') || [];
-    const catMap = {};
+    const seen = new Set();
+    const categories = [];
     for (const ans of detailedAnswers) {
-      if (!catMap[ans.category_id]) {
-        catMap[ans.category_id] = { id: ans.category_id, name: ans.category_name, slug: ans.category_slug };
+      if (!seen.has(ans.category_id)) {
+        seen.add(ans.category_id);
+        categories.push({ id: ans.category_id, name: ans.category_name, slug: ans.category_slug });
       }
     }
-    return Object.values(catMap);
+    return categories;
   }
 
   function getAnswersForCategory(categoryId) {
@@ -218,6 +221,8 @@ function VotingView(container, { params }) {
       const vc = voteCounts[ans.answer_id] || { positive: 0, negative: 0 };
       const net = vc.positive - vc.negative;
       const netText = net >= 0 ? `+${net}` : `${net}`;
+      const players = Store.get('players') || [];
+      const totalVoters = Math.max(players.length - 1, 0); // cevap sahibi hariç
 
       return `
         <div class="card-retro p-4" data-answer-id="${ans.answer_id}">
@@ -236,18 +241,30 @@ function VotingView(container, { params }) {
               ${revealMode === 'button' && isSelf && !isEmpty && !isRevealed ? `
                 <button class="reveal-btn btn-retro text-xs mt-2" data-answer-id="${ans.answer_id}">CEVABI GÖSTER 👁</button>
               ` : ''}
-              ${revealMode === 'button' && isSelf && !isEmpty && isRevealed ? `
-                <span class="inline-block text-xs text-retro-green mt-2 font-vt323">✓ Cevap gösterildi</span>
+              ${revealMode === 'button' && isSelf && !isEmpty && isRevealed && !revealConfirmDismissed.has(Number(ans.answer_id)) ? `
+                <span class="reveal-confirmed inline-block text-xs text-retro-green mt-2 font-vt323 transition-opacity duration-500">✓ Cevap gösterildi</span>
               ` : ''}
 
-              <!-- Oy detayları (açık oylama) -->
-              ${answerVotes.length > 0 ? `
-                <div class="flex flex-wrap gap-1 mt-2">
-                  ${answerVotes.map(v => `
-                    <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${v.vote_type === 'positive' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30' : 'bg-red-500/20 text-red-400 border border-red-400/30'}">
-                      ${escapeHtml(v.voter_name || 'Oyuncu')} ${v.vote_type === 'positive' ? '✓' : '✗'}
-                    </span>
-                  `).join('')}
+              <!-- Oy kutuları (açık oylama — anonim kutucuklar) -->
+              ${totalVoters > 0 ? `
+                <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                  ${(() => {
+                    const positiveCount = vc.positive || 0;
+                    const negativeCount = vc.negative || 0;
+                    const emptyCount = Math.max(totalVoters - positiveCount - negativeCount, 0);
+                    let boxes = '';
+                    for (let i = 0; i < positiveCount; i++) {
+                      boxes += '<span class="vote-box vote-box-positive inline-flex items-center justify-center w-6 h-6 rounded border-2 border-emerald-400 bg-emerald-500/30 text-emerald-400 text-xs font-bold" title="Olumlu oy">✓</span>';
+                    }
+                    for (let i = 0; i < negativeCount; i++) {
+                      boxes += '<span class="vote-box vote-box-negative inline-flex items-center justify-center w-6 h-6 rounded border-2 border-red-400 bg-red-500/30 text-red-400 text-xs font-bold" title="Olumsuz oy">✗</span>';
+                    }
+                    for (let i = 0; i < emptyCount; i++) {
+                      boxes += '<span class="vote-box vote-box-empty inline-block w-6 h-6 rounded border-2 border-retro-text/15 bg-retro-surface/30"></span>';
+                    }
+                    return boxes;
+                  })()}
+                  <span class="font-vt323 text-xs text-retro-text/40 ml-1">${vc.positive + vc.negative}/${totalVoters}</span>
                 </div>
               ` : ''}
 
@@ -385,14 +402,14 @@ function VotingView(container, { params }) {
   }
 
   function setupSocketEvents() {
-    // Vote update (açık oylama - kim oy verdi göster)
+    // Vote update (açık oylama — anonim kutucuklar)
     const unsub1 = SocketClient.on('game:vote_update', ({ answerId, positive, negative, voterName, voterUserId, voteType }) => {
       // Oy sayılarını Store'da sakla (re-render sonrası kaybolmasın)
       const voteCounts = Store.get('voteCounts') || {};
       voteCounts[answerId] = { positive: positive || 0, negative: negative || 0 };
       Store.set('voteCounts', { ...voteCounts });
 
-      // Açık oylama detaylarını güncelle
+      // Açık oylama detaylarını güncelle (skor hesaplaması için gerekli)
       if (voterName && voteType) {
         const voteDetails = Store.get('voteDetails') || {};
         if (!voteDetails[answerId]) voteDetails[answerId] = [];
@@ -407,7 +424,17 @@ function VotingView(container, { params }) {
           voteDetails[answerId].push({ voter_user_id: voterUserId, voter_name: voterName, vote_type: voteType });
         }
         Store.set('voteDetails', { ...voteDetails });
-        renderCurrentCategory();
+      }
+
+      // Her oy güncellemesinde UI'ı yenile (kutucuklar için)
+      renderCurrentCategory();
+
+      // Animasyonu sadece oy verilen kartın kutucuklarına uygula
+      const votedCard = document.querySelector(`[data-answer-id="${answerId}"]`);
+      if (votedCard) {
+        votedCard.querySelectorAll('.vote-box-positive, .vote-box-negative').forEach(box => {
+          box.classList.add('vote-box-pop');
+        });
       }
     });
 
@@ -457,6 +484,16 @@ function VotingView(container, { params }) {
     const unsub5 = SocketClient.on('game:answer_revealed', ({ answerId }) => {
       revealedAnswers.add(Number(answerId));
       renderCurrentCategory();
+
+      // "Cevap gösterildi" yazısını 3 saniye sonra gizle ve bir daha gösterme
+      setTimeout(() => {
+        revealConfirmDismissed.add(Number(answerId));
+        const confirmEls = document.querySelectorAll('.reveal-confirmed');
+        confirmEls.forEach(el => {
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 500);
+        });
+      }, 3000);
     });
 
     // Oylama timer

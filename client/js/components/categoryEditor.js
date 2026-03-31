@@ -7,6 +7,13 @@ const CategoryEditor = (() => {
   let showSuggestions = false;
   let filterText = '';
 
+  // Drag state
+  let dragSrcIdx = null;
+  let touchDragEl = null;
+  let touchClone = null;
+  let touchStartY = 0;
+  let touchStartX = 0;
+
   // Sabit kategori listesi — DB'den çekilmez, her zaman aynıdır
   const STATIC_CATEGORIES = [
     // Varsayılan
@@ -95,8 +102,9 @@ const CategoryEditor = (() => {
     if (!container) return;
 
     const chips = categories.map((cat, i) => `
-      <div class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-retro-accent/30 bg-retro-surface/50 font-vt323 text-sm text-retro-text"
+      <div class="cat-chip inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-retro-accent/30 bg-retro-surface/50 font-vt323 text-sm text-retro-text ${isOwner ? 'cursor-grab select-none' : ''}"
            draggable="${isOwner}" data-cat-id="${cat.id}" data-cat-idx="${i}">
+        ${isOwner ? '<span class="drag-handle text-retro-text/30 text-xs mr-0.5" style="cursor:grab;">⋮⋮</span>' : ''}
         <span>${escapeHtml(cat.name)}</span>
         ${isOwner ? `<button class="text-retro-accent/50 hover:text-retro-accent ml-1 cat-remove" data-cat-id="${cat.id}" title="Kaldır">✕</button>` : ''}
       </div>
@@ -195,7 +203,163 @@ const CategoryEditor = (() => {
           if (e.key === 'Enter') { e.preventDefault(); doAdd(); }
         });
       }
+
+      // ── Drag & Drop (Desktop) ──
+      setupDragAndDrop();
     }
+  }
+
+  function setupDragAndDrop() {
+    const chipsContainer = document.getElementById('cat-chips');
+    if (!chipsContainer || !isOwner) return;
+
+    const chipEls = chipsContainer.querySelectorAll('.cat-chip[draggable="true"]');
+
+    chipEls.forEach(chip => {
+      // Desktop: dragstart
+      chip.addEventListener('dragstart', (e) => {
+        dragSrcIdx = parseInt(chip.dataset.catIdx);
+        chip.classList.add('opacity-40', 'scale-95');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', dragSrcIdx);
+      });
+
+      // Desktop: dragend
+      chip.addEventListener('dragend', () => {
+        chip.classList.remove('opacity-40', 'scale-95');
+        clearDropIndicators();
+        dragSrcIdx = null;
+      });
+
+      // Desktop: dragover
+      chip.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const overIdx = parseInt(chip.dataset.catIdx);
+        if (dragSrcIdx === null || overIdx === dragSrcIdx) return;
+        clearDropIndicators();
+        chip.classList.add('ring-2', 'ring-retro-accent', 'ring-offset-1');
+      });
+
+      // Desktop: dragleave
+      chip.addEventListener('dragleave', () => {
+        chip.classList.remove('ring-2', 'ring-retro-accent', 'ring-offset-1');
+      });
+
+      // Desktop: drop
+      chip.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const targetIdx = parseInt(chip.dataset.catIdx);
+        if (dragSrcIdx === null || targetIdx === dragSrcIdx) return;
+        reorderCategories(dragSrcIdx, targetIdx);
+        dragSrcIdx = null;
+      });
+
+      // ── Touch support (Mobile) ──
+      chip.addEventListener('touchstart', (e) => {
+        if (!isOwner) return;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchDragEl = chip;
+        dragSrcIdx = parseInt(chip.dataset.catIdx);
+
+        // Uzun basma ile sürükleme başlat
+        chip._touchTimer = setTimeout(() => {
+          chip.classList.add('opacity-40', 'scale-95');
+
+          // Klon oluştur (parmağın altında takip eden)
+          touchClone = chip.cloneNode(true);
+          touchClone.style.position = 'fixed';
+          touchClone.style.zIndex = '9999';
+          touchClone.style.pointerEvents = 'none';
+          touchClone.style.opacity = '0.85';
+          touchClone.style.transform = 'scale(1.1)';
+          touchClone.style.left = (touch.clientX - 40) + 'px';
+          touchClone.style.top = (touch.clientY - 15) + 'px';
+          document.body.appendChild(touchClone);
+        }, 200);
+      }, { passive: true });
+
+      chip.addEventListener('touchmove', (e) => {
+        if (!touchClone || dragSrcIdx === null) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+
+        // Klonu hareket ettir
+        touchClone.style.left = (touch.clientX - 40) + 'px';
+        touchClone.style.top = (touch.clientY - 15) + 'px';
+
+        // Hangi chip'in üzerindeyiz?
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        clearDropIndicators();
+        if (el) {
+          const targetChip = el.closest('.cat-chip[data-cat-idx]');
+          if (targetChip && parseInt(targetChip.dataset.catIdx) !== dragSrcIdx) {
+            targetChip.classList.add('ring-2', 'ring-retro-accent', 'ring-offset-1');
+          }
+        }
+      }, { passive: false });
+
+      chip.addEventListener('touchend', (e) => {
+        clearTimeout(chip._touchTimer);
+
+        if (touchClone) {
+          const touch = e.changedTouches[0];
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (el) {
+            const targetChip = el.closest('.cat-chip[data-cat-idx]');
+            if (targetChip) {
+              const targetIdx = parseInt(targetChip.dataset.catIdx);
+              if (dragSrcIdx !== null && targetIdx !== dragSrcIdx) {
+                reorderCategories(dragSrcIdx, targetIdx);
+              }
+            }
+          }
+
+          // Temizlik
+          touchClone.remove();
+          touchClone = null;
+        }
+
+        if (touchDragEl) {
+          touchDragEl.classList.remove('opacity-40', 'scale-95');
+          touchDragEl = null;
+        }
+        clearDropIndicators();
+        dragSrcIdx = null;
+      });
+
+      chip.addEventListener('touchcancel', () => {
+        clearTimeout(chip._touchTimer);
+        if (touchClone) { touchClone.remove(); touchClone = null; }
+        if (touchDragEl) { touchDragEl.classList.remove('opacity-40', 'scale-95'); touchDragEl = null; }
+        clearDropIndicators();
+        dragSrcIdx = null;
+      });
+    });
+  }
+
+  function clearDropIndicators() {
+    const chipsContainer = document.getElementById('cat-chips');
+    if (!chipsContainer) return;
+    chipsContainer.querySelectorAll('.cat-chip').forEach(c => {
+      c.classList.remove('ring-2', 'ring-retro-accent', 'ring-offset-1');
+    });
+  }
+
+  function reorderCategories(fromIdx, toIdx) {
+    const reordered = [...categories];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+    categories = reordered;
+
+    // Sunucuya yeni sırayı gönder
+    const categoryIds = reordered.map(c => c.id);
+    SocketClient.send('room:update_categories', { categoryIds });
+
+    // UI'ı anında güncelle (optimistic)
+    update();
   }
 
   function destroy() {

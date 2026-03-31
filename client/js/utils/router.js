@@ -115,25 +115,25 @@ const Router = (() => {
     if (user) {
       const isGuest = Store.isGuest();
       nav.innerHTML = `
-        <a href="/" data-link class="font-vt323 text-lg ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
-        <a href="/leaderboard" data-link class="font-vt323 text-lg ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
-        ${isGuest ? '' : `<a href="/profile" data-link class="font-vt323 text-lg ${currentPath === '/profile' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Profil</a>`}
-        <a href="/contact" data-link class="font-vt323 text-lg ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
-        <div class="flex items-center gap-2">
-          <span class="player-avatar">${(user.display_name || user.username)[0].toUpperCase()}</span>
-          <span class="font-vt323 text-retro-gold">${escapeHtml(user.display_name || user.username)}</span>
-          ${isGuest ? '<span class="badge-retro text-xs bg-retro-green/20 text-retro-green">Misafir</span>' : `<span class="badge-retro">Lv.${user.level || 1}</span>`}
+        <a href="/" data-link class="font-vt323 text-sm ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
+        <a href="/leaderboard" data-link class="font-vt323 text-sm ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
+        ${isGuest ? '' : `<a href="/profile" data-link class="font-vt323 text-sm ${currentPath === '/profile' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Profil</a>`}
+        <a href="/contact" data-link class="font-vt323 text-sm ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
+        <div class="flex items-center gap-1.5">
+          <span class="player-avatar text-xs">${(user.display_name || user.username)[0].toUpperCase()}</span>
+          <span class="font-vt323 text-sm text-retro-gold">${escapeHtml(user.display_name || user.username)}</span>
+          ${isGuest ? '<span class="badge-retro text-[0.6rem] bg-retro-green/20 text-retro-green">Misafir</span>' : `<span class="badge-retro text-[0.6rem]">Lv.${user.level || 1}</span>`}
         </div>
-        ${isGuest ? '<a href="/auth" data-link class="font-vt323 text-sm text-retro-green hover:text-retro-accent transition-colors">Kayıt Ol</a>' : ''}
-        <button id="btn-logout" class="font-vt323 text-sm text-retro-text/50 hover:text-retro-accent transition-colors">Çıkış</button>
+        ${isGuest ? '<a href="/auth" data-link class="font-vt323 text-xs text-retro-green hover:text-retro-accent transition-colors">Kayıt Ol</a>' : ''}
+        <button id="btn-logout" class="font-vt323 text-xs text-retro-text/50 hover:text-retro-accent transition-colors">Çıkış</button>
       `;
       document.getElementById('btn-logout').addEventListener('click', () => App.logout());
     } else {
       nav.innerHTML = `
-        <a href="/" data-link class="font-vt323 text-lg ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
-        <a href="/leaderboard" data-link class="font-vt323 text-lg ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
-        <a href="/contact" data-link class="font-vt323 text-lg ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
-        <a href="/auth" data-link class="btn-retro text-xs">Giriş Yap</a>
+        <a href="/" data-link class="font-vt323 text-sm ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
+        <a href="/leaderboard" data-link class="font-vt323 text-sm ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
+        <a href="/contact" data-link class="font-vt323 text-sm ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
+        <a href="/auth" data-link class="btn-retro text-[0.6rem]">Giriş Yap</a>
       `;
     }
   }

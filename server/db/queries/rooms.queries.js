@@ -216,12 +216,21 @@ const roomsQueries = {
     return result.rows[0] || null;
   },
 
+  // left_at dahil — bitmiş odalarda skorboard recovery için
+  async getPlayerByRoomAndUserIncludeLeft(roomId, userId) {
+    const result = await query(
+      'SELECT * FROM room_players WHERE room_id = $1 AND user_id = $2 ORDER BY joined_at DESC LIMIT 1',
+      [roomId, userId]
+    );
+    return result.rows[0] || null;
+  },
+
   async getActiveRoomForUser(userId) {
     const result = await query(
       `SELECT r.id FROM room_players rp
        JOIN rooms r ON r.id = rp.room_id
        WHERE rp.user_id = $1 AND rp.left_at IS NULL
-         AND r.status IN ('waiting', 'playing')
+         AND r.status IN ('waiting', 'playing', 'finished')
        LIMIT 1`,
       [userId]
     );

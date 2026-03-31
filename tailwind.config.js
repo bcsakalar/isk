@@ -22,9 +22,9 @@ module.exports = {
       },
       fontFamily: {
         pixel: ['"Press Start 2P"', 'monospace'],
-        retro: ['"VT323"', 'monospace'],
-        vt323: ['"VT323"', 'monospace'],
-        body: ['"Space Mono"', 'monospace']
+        retro: ['"IBM Plex Mono"', 'monospace'],
+        vt323: ['"IBM Plex Mono"', 'monospace'],
+        body: ['"IBM Plex Mono"', 'monospace']
       },
       animation: {
         'slide-up': 'slideUp 0.3s ease-out',
