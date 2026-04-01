@@ -6,6 +6,8 @@ const helmetMiddleware = helmet({
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
+        "'unsafe-inline'",  // Cloudflare Web Analytics inline script için gerekli
+        "https://static.cloudflareinsights.com",  // Cloudflare beacon.min.js
       ],
       styleSrc: [
         "'self'",
@@ -14,7 +16,7 @@ const helmetMiddleware = helmet({
       ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      connectSrc: ["'self'", "ws:", "wss:", "https://cloudflareinsights.com"],
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
