@@ -101,7 +101,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 
 # SSL sertifikası (Let's Encrypt)
-sudo certbot --nginx -d demoishsite.com
+sudo certbot --nginx -d isimsehirkatman.com
 ```
 
 ## Docker Olmadan Lokal Çalıştırma

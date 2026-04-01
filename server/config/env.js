@@ -56,7 +56,7 @@ const config = {
 
   admin: {
     username: process.env.ADMIN_INITIAL_USERNAME || 'admin',
-    email: process.env.ADMIN_INITIAL_EMAIL || 'admin@katmanisimsehir.com',
+    email: process.env.ADMIN_INITIAL_EMAIL || 'admin@isimsehirkatman.com',
     password: process.env.ADMIN_INITIAL_PASSWORD || 'Admin123!',
   },
 };
