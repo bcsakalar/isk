@@ -39,8 +39,7 @@ function AuthView(container) {
               <label class="flex items-start gap-2 cursor-pointer">
                 <input type="checkbox" name="kvkkConsent" class="mt-1 accent-retro-accent" />
                 <span class="font-vt323 text-xs text-retro-text/60">
-                  <a href="/privacy" data-link class="text-retro-accent underline hover:text-retro-gold">Gizlilik Politikası</a> ve
-                  <a href="/privacy" data-link class="text-retro-accent underline hover:text-retro-gold">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.
+                  <a href="/privacy" data-link class="text-retro-accent underline hover:text-retro-gold">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.
                 </span>
               </label>
             </div>
