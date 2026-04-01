@@ -52,8 +52,17 @@ app.use('/admin', (req, res, next) => {
 });
 
 // ======= STATIC FILES =======
-app.use(express.static(path.join(__dirname, '..', 'client'), { maxAge: '1d' }));
-app.use('/admin', express.static(path.join(__dirname, '..', 'admin'), { maxAge: '1d' }));
+const staticCacheOptions = {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    // CSS ve JS dosyaları her zaman doğrulansın (deploy sonrası hemen güncellenir)
+    if (filePath.endsWith('.css') || filePath.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+  }
+};
+app.use(express.static(path.join(__dirname, '..', 'client'), staticCacheOptions));
+app.use('/admin', express.static(path.join(__dirname, '..', 'admin'), staticCacheOptions));
 
 // ======= API ROUTES =======
 app.use('/api/auth', authRoutes);
