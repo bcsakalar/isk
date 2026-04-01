@@ -30,6 +30,9 @@ const accountDeletionJob = require('./jobs/accountDeletion.job');
 const app = express();
 const server = http.createServer(app);
 
+// Nginx reverse proxy arkasında gerçek IP'yi al
+app.set('trust proxy', 1);
+
 // ======= MIDDLEWARE =======
 app.use(helmetConfig);
 app.use(corsConfig);
