@@ -21,7 +21,7 @@ const Modal = (() => {
           <button class="text-retro-text/50 hover:text-retro-accent text-2xl font-vt323" data-action="close">&times;</button>
         </div>
         <div class="mb-6 font-vt323 text-lg">${content}</div>
-        <div class="flex gap-3 justify-end">${btnHtml}</div>
+        <div class="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3 sm:justify-end">${btnHtml}</div>
       </div>
     `;
 

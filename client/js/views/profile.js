@@ -47,7 +47,7 @@ function ProfileView(container) {
     el.innerHTML = `
       <!-- Profil Kartı -->
       <div class="card-retro text-center py-8">
-        <div class="player-avatar w-20 h-20 text-3xl mx-auto">
+        <div class="player-avatar w-14 h-14 sm:w-20 sm:h-20 text-xl sm:text-3xl mx-auto">
           ${(user.display_name || user.username)[0].toUpperCase()}
         </div>
         <h3 class="font-pixel text-retro-accent text-sm mt-4">${escapeHtml(user.display_name || user.username)}</h3>
@@ -110,27 +110,27 @@ function ProfileView(container) {
       <div class="card-retro mt-6">
         <h4 class="font-pixel text-xs text-retro-gold mb-3">VERİ YÖNETİMİ (KVKK)</h4>
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p class="font-vt323 text-sm text-retro-text">Verilerimi İndir</p>
               <p class="font-mono text-xs text-retro-text/40">Tüm kişisel verilerinizi JSON formatında indirin</p>
             </div>
-            <button id="btn-export-data" class="btn-retro-outline text-xs">İNDİR</button>
+            <button id="btn-export-data" class="btn-retro-outline text-xs self-start sm:self-auto">İNDİR</button>
           </div>
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p class="font-vt323 text-sm text-retro-text">Gizlilik Politikası</p>
               <p class="font-mono text-xs text-retro-text/40">KVKK aydınlatma metni ve gizlilik politikası</p>
             </div>
-            <a href="/privacy" data-link class="btn-retro-outline text-xs">GÖRÜNTÜLE</a>
+            <a href="/privacy" data-link class="btn-retro-outline text-xs self-start sm:self-auto">GÖRÜNTÜLE</a>
           </div>
           <div class="border-t border-retro-accent/20 pt-3">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p class="font-vt323 text-sm text-retro-accent">Hesabımı Sil</p>
                 <p class="font-mono text-xs text-retro-text/40">30 gün sonra kalıcı olarak silinir</p>
               </div>
-              <button id="btn-delete-account" class="btn-retro text-xs bg-red-900/30 border-red-500 hover:bg-red-900/50">SİL</button>
+              <button id="btn-delete-account" class="btn-retro text-xs bg-red-900/30 border-red-500 hover:bg-red-900/50 self-start sm:self-auto">SİL</button>
             </div>
             <div id="deletion-status" class="hidden mt-2"></div>
           </div>

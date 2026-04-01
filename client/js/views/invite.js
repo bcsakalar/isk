@@ -194,7 +194,7 @@ function InviteView(container, { params }) {
             <span class="font-mono text-xs text-retro-text/40">${code}</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 text-sm">
             <div class="text-center p-2 rounded bg-retro-bg/50">
               <span class="font-pixel text-xs text-retro-text/50 block">OYUNCULAR</span>
               <span class="font-vt323 text-lg text-retro-accent" id="invite-player-count">${roomData.player_count || 0}/${roomData.max_players || 10}</span>

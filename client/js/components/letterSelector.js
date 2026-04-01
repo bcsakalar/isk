@@ -43,7 +43,7 @@ const LetterSelector = (() => {
 
     const buttons = ALL_LETTERS.map(l => {
       const isActive = selected.has(l);
-      return `<button class="w-9 h-9 rounded-full font-vt323 text-sm transition-all letter-toggle
+      return `<button class="w-7 h-7 sm:w-9 sm:h-9 rounded-full font-vt323 text-xs sm:text-sm transition-all letter-toggle
                       ${isActive ? 'bg-retro-accent/20 text-retro-accent border border-retro-accent' : 'bg-retro-surface/30 text-retro-text/30 border border-retro-text/10'}
                       ${isOwner ? 'hover:border-retro-accent cursor-pointer' : 'cursor-default'}"
                       data-letter="${l}">${l}</button>`;

@@ -30,7 +30,7 @@ function RoomView(container, { params }) {
           <div class="flex items-center justify-between">
             <div>
               <h2 class="font-pixel text-retro-accent text-sm" id="room-name">ODA</h2>
-              <p class="font-vt323 text-retro-text/60 flex items-center gap-1">
+              <p class="font-vt323 text-retro-text/60 flex flex-wrap items-center gap-1">
                 Kod: <span class="text-retro-gold font-mono" id="room-code">*******</span>
                 <button class="text-retro-accent/50 hover:text-retro-accent text-xs" id="btn-toggle-code" title="Kodu göster/gizle">👁️‍🗨️</button>
                 <button class="text-retro-accent/50 hover:text-retro-accent text-xs" id="btn-copy-code">📋</button>
@@ -42,7 +42,7 @@ function RoomView(container, { params }) {
           <!-- Ayarlar -->
           <div class="card-retro p-4" id="settings-panel">
             <h3 class="font-pixel text-xs text-retro-gold mb-3">ODA AYARLARI</h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="settings-fields">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="settings-fields">
               <!-- Dinamik olarak doldurulur -->
             </div>
           </div>

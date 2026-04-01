@@ -50,7 +50,7 @@ function ScoreboardView(container, { params }) {
             <h1 class="font-pixel text-retro-gold text-xl mb-4">OYUN BİTTİ!</h1>
             ${winner ? `
               <div class="animate-bounce-in">
-                <div class="player-avatar w-20 h-20 text-3xl mx-auto border-retro-gold border-4">
+                <div class="player-avatar w-14 h-14 sm:w-20 sm:h-20 text-xl sm:text-3xl mx-auto border-retro-gold border-4">
                   ${(winner.display_name || winner.username || '?')[0].toUpperCase()}
                 </div>
                 <h2 class="font-pixel text-retro-accent text-sm mt-4">${escapeHtml(winner.display_name || winner.username || 'Oyuncu')} KAZANDI! 🏆</h2>
@@ -94,7 +94,7 @@ function ScoreboardView(container, { params }) {
         </div>
 
         <!-- Aksiyonlar -->
-        <div class="flex gap-4 justify-center">
+        <div class="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:justify-center">
           ${isFinished ? `
             <button class="btn-retro" id="btn-back-room">ODAYA DÖN</button>
             <button class="btn-retro-secondary" id="btn-back-lobby">LOBİYE DÖN</button>

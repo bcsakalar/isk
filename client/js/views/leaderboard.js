@@ -11,8 +11,8 @@ function LeaderboardView(container) {
 
         <!-- Periyot Seçimi -->
         <div class="flex justify-center gap-2">
-          <button class="btn-retro text-xs ${currentPeriod === 'all' ? '' : 'opacity-50'}" data-period="all">TÜM ZAMANLAR</button>
-          <button class="btn-retro text-xs ${currentPeriod === 'weekly' ? '' : 'opacity-50'}" data-period="weekly">HAFTALIK</button>
+          <button class="btn-retro text-[0.55rem] sm:text-xs ${currentPeriod === 'all' ? '' : 'opacity-50'}" data-period="all">TÜM ZAMANLAR</button>
+          <button class="btn-retro text-[0.55rem] sm:text-xs ${currentPeriod === 'weekly' ? '' : 'opacity-50'}" data-period="weekly">HAFTALIK</button>
         </div>
 
         <!-- Leaderboard -->
@@ -57,9 +57,9 @@ function LeaderboardView(container) {
                   ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
                 </span>
                 <div class="player-avatar text-xs">${(entry.display_name || entry.username || '?')[0].toUpperCase()}</div>
-                <div>
-                  <p class="font-vt323 text-base">${escapeHtml(entry.display_name || entry.username)}</p>
-                  <p class="font-mono text-xs text-retro-text/40">Lv.${entry.level || 1} · ${entry.games_played || entry.total_games || 0} oyun</p>
+                <div class="min-w-0">
+                  <p class="font-vt323 text-sm sm:text-base truncate">${escapeHtml(entry.display_name || entry.username)}</p>
+                  <p class="font-mono text-[0.6rem] sm:text-xs text-retro-text/40">Lv.${entry.level || 1} · ${entry.games_played || entry.total_games || 0} oyun</p>
                 </div>
               </div>
               <div class="text-right">

@@ -68,17 +68,17 @@ function VotingView(container, { params }) {
         <!-- Sol: Oylama alanı -->
         <div class="lg:col-span-3 space-y-4">
           <!-- Üst bar -->
-          <div class="card-retro p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-4">
-                <span class="font-pixel text-xs text-retro-text/50">TUR</span>
-                <span class="font-pixel text-lg text-retro-gold">${round?.round_number || 1}</span>
-                <span class="font-pixel text-xs text-retro-text/50">/ ${room?.total_rounds || 5}</span>
-                <span class="font-pixel text-4xl text-retro-accent ml-4">${round?.letter || '?'}</span>
+          <div class="card-retro p-3 sm:p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2 sm:gap-4">
+                <span class="font-pixel text-[0.6rem] sm:text-xs text-retro-text/50">TUR</span>
+                <span class="font-pixel text-sm sm:text-lg text-retro-gold">${round?.round_number || 1}</span>
+                <span class="font-pixel text-[0.6rem] sm:text-xs text-retro-text/50">/ ${room?.total_rounds || 5}</span>
+                <span class="font-pixel text-2xl sm:text-4xl text-retro-accent ml-2 sm:ml-4">${round?.letter || '?'}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="badge-retro bg-retro-purple/20 text-retro-purple border-retro-purple">OYLAMA</span>
-                ${isOwner ? '<button id="btn-end-voting" class="btn-retro-secondary text-xs">OYLAMAYI BİTİR</button>' : ''}
+                <span class="badge-retro bg-retro-purple/20 text-retro-purple border-retro-purple text-[0.55rem] sm:text-xs">OYLAMA</span>
+                ${isOwner ? '<button id="btn-end-voting" class="btn-retro-secondary text-[0.55rem] sm:text-xs px-2 py-1 sm:px-3 sm:py-1.5">OYLAMAYI BİTİR</button>' : ''}
               </div>
             </div>
 
@@ -94,10 +94,10 @@ function VotingView(container, { params }) {
             </div>
 
             <!-- Kategori navigasyonu -->
-            <div class="flex items-center justify-between">
-              <button id="btn-prev-cat" class="btn-retro-outline text-xs px-3 py-1">◀</button>
-              <span class="font-pixel text-sm text-retro-gold" id="cat-nav-label">Kategori 1/1</span>
-              <button id="btn-next-cat" class="btn-retro-outline text-xs px-3 py-1">▶</button>
+            <div class="flex items-center justify-between gap-2">
+              <button id="btn-prev-cat" class="btn-retro-outline text-[0.55rem] px-2 py-1 sm:text-xs sm:px-3 sm:py-1">◀</button>
+              <span class="font-pixel text-[0.6rem] sm:text-sm text-retro-gold text-center" id="cat-nav-label">Kategori 1/1</span>
+              <button id="btn-next-cat" class="btn-retro-outline text-[0.55rem] px-2 py-1 sm:text-xs sm:px-3 sm:py-1">▶</button>
             </div>
           </div>
 
@@ -225,10 +225,10 @@ function VotingView(container, { params }) {
       const totalVoters = Math.max(players.length - 1, 0); // cevap sahibi hariç
 
       return `
-        <div class="card-retro p-4" data-answer-id="${ans.answer_id}">
-          <div class="flex items-start justify-between gap-4">
+        <div class="card-retro p-3 sm:p-4" data-answer-id="${ans.answer_id}">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <!-- Oyuncu + Cevap -->
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-2">
                 <span class="player-avatar text-xs">${(ans.display_name || ans.username || '?')[0].toUpperCase()}</span>
                 <span class="font-vt323 text-sm ${isSelf ? 'text-retro-gold' : ''}">${escapeHtml(ans.display_name || ans.username || 'Oyuncu')}</span>
@@ -254,13 +254,13 @@ function VotingView(container, { params }) {
                     const emptyCount = Math.max(totalVoters - positiveCount - negativeCount, 0);
                     let boxes = '';
                     for (let i = 0; i < positiveCount; i++) {
-                      boxes += '<span class="vote-box vote-box-positive inline-flex items-center justify-center w-6 h-6 rounded border-2 border-emerald-400 bg-emerald-500/30 text-emerald-400 text-xs font-bold" title="Olumlu oy">✓</span>';
+                      boxes += '<span class="vote-box vote-box-positive inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded border-2 border-emerald-400 bg-emerald-500/30 text-emerald-400 text-[0.6rem] sm:text-xs font-bold" title="Olumlu oy">✓</span>';
                     }
                     for (let i = 0; i < negativeCount; i++) {
-                      boxes += '<span class="vote-box vote-box-negative inline-flex items-center justify-center w-6 h-6 rounded border-2 border-red-400 bg-red-500/30 text-red-400 text-xs font-bold" title="Olumsuz oy">✗</span>';
+                      boxes += '<span class="vote-box vote-box-negative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded border-2 border-red-400 bg-red-500/30 text-red-400 text-[0.6rem] sm:text-xs font-bold" title="Olumsuz oy">✗</span>';
                     }
                     for (let i = 0; i < emptyCount; i++) {
-                      boxes += '<span class="vote-box vote-box-empty inline-block w-6 h-6 rounded border-2 border-retro-text/15 bg-retro-surface/30"></span>';
+                      boxes += '<span class="vote-box vote-box-empty inline-block w-5 h-5 sm:w-6 sm:h-6 rounded border-2 border-retro-text/15 bg-retro-surface/30"></span>';
                     }
                     return boxes;
                   })()}
@@ -272,13 +272,13 @@ function VotingView(container, { params }) {
               <div class="flex items-center gap-1.5 mt-2" id="images-${ans.answer_id}">
                 ${(answerImages[ans.answer_id] || []).map(img => `
                   <img src="${img.imageData}" data-image-src="${img.imageData}"
-                       class="evidence-thumb w-9 h-9 rounded border border-retro-accent/30
+                       class="evidence-thumb w-8 h-8 sm:w-9 sm:h-9 rounded border border-retro-accent/30
                               object-cover cursor-pointer hover:border-retro-accent hover:scale-110
                               transition-all" title="Kanıt — tıkla büyüt" />
                 `).join('')}
                 ${!isEmpty && isVisible && (answerImages[ans.answer_id] || []).length < 3 ? `
                   <label class="evidence-upload-btn cursor-pointer inline-flex items-center justify-center
-                                w-9 h-9 rounded border border-dashed border-retro-accent/30
+                                w-8 h-8 sm:w-9 sm:h-9 rounded border border-dashed border-retro-accent/30
                                 bg-retro-surface/30 hover:border-retro-accent hover:bg-retro-surface/50
                                 transition-all group" title="Kanıt ekle (${3 - (answerImages[ans.answer_id] || []).length} hak)">
                     <span class="text-retro-accent/50 group-hover:text-retro-accent text-sm">📷</span>
@@ -293,12 +293,12 @@ function VotingView(container, { params }) {
 
             <!-- Oy butonları (sadece görünür, kendi cevabı olmayan) -->
             ${!isEmpty && !isSelf && isVisible ? `
-              <div class="flex flex-col items-center gap-2">
-                <button class="vote-btn w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all
+              <div class="flex items-center gap-2 sm:flex-col sm:items-center sm:gap-2">
+                <button class="vote-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center transition-all
                   ${myVote === 'positive' ? 'bg-emerald-500/30 border-emerald-400 text-emerald-400' : 'border-retro-text/20 text-retro-text/40 hover:border-emerald-400 hover:text-emerald-400'}"
                   data-answer-id="${ans.answer_id}" data-vote-type="positive">✓</button>
                 <span class="font-pixel text-xs text-retro-text/50 vote-count" data-count-for="${ans.answer_id}">${netText}</span>
-                <button class="vote-btn w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all
+                <button class="vote-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center transition-all
                   ${myVote === 'negative' ? 'bg-red-500/30 border-red-400 text-red-400' : 'border-retro-text/20 text-retro-text/40 hover:border-red-400 hover:text-red-400'}"
                   data-answer-id="${ans.answer_id}" data-vote-type="negative">✗</button>
               </div>

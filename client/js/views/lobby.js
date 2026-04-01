@@ -5,7 +5,7 @@ function LobbyView(container) {
 
   function render() {
     container.innerHTML = `
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <!-- Sol: Oda Listesi -->
         <div class="lg:col-span-2 space-y-4">
           ${!isAuthenticated ? `
@@ -198,8 +198,8 @@ function LobbyView(container) {
     }
 
     listEl.innerHTML = rooms.map(room => `
-      <div class="card-retro p-4 hover:border-retro-accent/60 transition-colors cursor-pointer" data-room-code="${escapeAttr(room.code)}">
-        <div class="flex items-center justify-between mb-2">
+      <div class="card-retro p-3 sm:p-4 hover:border-retro-accent/60 transition-colors cursor-pointer" data-room-code="${escapeAttr(room.code)}">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
           <div>
             <h3 class="font-pixel text-xs text-retro-accent">${escapeHtml(room.name)}</h3>
             ${room.owner_name ? `<p class="font-vt323 text-sm text-retro-gold mt-0.5">👑 ${escapeHtml(room.owner_name)}</p>` : ''}
@@ -209,7 +209,7 @@ function LobbyView(container) {
             <button class="btn-retro text-xs" data-join="${escapeAttr(room.code)}" ${room.status === 'playing' ? 'disabled' : ''}>KATIL</button>
           </div>
         </div>
-        <div class="flex flex-wrap gap-x-4 gap-y-1 font-vt323 text-xs text-retro-text/50">
+        <div class="flex flex-wrap gap-x-2 gap-y-1 sm:gap-x-4 font-vt323 text-xs text-retro-text/50">
           <span>👥 ${room.player_count || 0}/${room.max_players}</span>
           <span>🔄 ${room.total_rounds} tur</span>
           <span>⏱️ ${room.time_per_round} sn</span>

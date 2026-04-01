@@ -10,7 +10,7 @@ const ChatComponent = (() => {
     _currentRoomId = roomId;
 
     container = document.createElement('div');
-    container.className = 'card-retro flex flex-col h-[28rem]';
+    container.className = 'card-retro flex flex-col h-[16rem] sm:h-[20rem] lg:h-[28rem]';
     container.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <h4 class="font-pixel text-xs text-retro-accent">${roomId ? 'Oda Sohbet' : 'Lobi Sohbet'}</h4>

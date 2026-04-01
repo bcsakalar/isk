@@ -30,8 +30,8 @@ function ErrorView(container, { params, query }) {
 
   function render() {
     container.innerHTML = `
-      <div class="max-w-md mx-auto mt-16 text-center space-y-6">
-        <div class="text-6xl mb-4">${errorInfo.icon}</div>
+      <div class="max-w-md mx-auto mt-8 sm:mt-16 text-center space-y-4 sm:space-y-6">
+        <div class="text-4xl sm:text-6xl mb-4">${errorInfo.icon}</div>
         <div class="card-retro p-8 space-y-4">
           <h1 class="font-pixel text-retro-accent text-lg">${errorCode}</h1>
           <h2 class="font-pixel text-retro-gold text-sm">${errorInfo.title}</h2>

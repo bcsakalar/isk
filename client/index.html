@@ -55,7 +55,7 @@
     </div>
   </noscript>
   <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+  <div id="toast-container" class="fixed top-2 left-2 right-2 z-50 flex flex-col gap-2 sm:left-auto sm:top-4 sm:right-4 sm:w-80"></div>
 
   <!-- Modal Container -->
   <div id="modal-container"></div>
@@ -72,22 +72,35 @@
           <span class="font-pixel text-retro-accent text-[0.6rem]">İSİM ŞEHİR</span>
           <span class="font-pixel text-retro-gold text-[0.5rem]">KATMAN</span>
         </a>
-        <nav id="nav-menu" class="flex items-center gap-3">
+        <!-- Hamburger button (mobile only) -->
+        <button id="hamburger-btn" class="md:hidden flex flex-col gap-1 p-2" aria-label="Menü">
+          <span class="block w-5 h-0.5 bg-retro-text transition-all" id="ham-line-1"></span>
+          <span class="block w-5 h-0.5 bg-retro-text transition-all" id="ham-line-2"></span>
+          <span class="block w-5 h-0.5 bg-retro-text transition-all" id="ham-line-3"></span>
+        </button>
+        <!-- Desktop nav -->
+        <nav id="nav-menu" class="hidden md:flex items-center gap-3">
+          <!-- Dinamik olarak doldurulur -->
+        </nav>
+        <!-- Mobile nav overlay -->
+        <div id="mobile-nav-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden"></div>
+        <nav id="mobile-nav-menu" class="fixed top-0 right-0 h-full w-64 bg-retro-surface border-l-2 border-retro-accent/30 z-[56] transform translate-x-full transition-transform duration-300 md:hidden flex flex-col p-4 pt-14 gap-3 overflow-y-auto">
+          <button id="mobile-nav-close" class="absolute top-3 right-3 font-vt323 text-2xl text-retro-text/50 hover:text-retro-accent">&times;</button>
           <!-- Dinamik olarak doldurulur -->
         </nav>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main id="app-content" class="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+    <main id="app-content" class="flex-1 max-w-6xl mx-auto w-full px-2 py-3 sm:px-4 sm:py-6">
       <!-- Router buraya render eder -->
     </main>
 
     <!-- Footer -->
-    <footer class="bg-retro-surface border-t-2 border-retro-accent/30 px-4 py-3 text-center">
-      <p class="font-mono text-xs text-retro-text/50">
+    <footer class="bg-retro-surface border-t-2 border-retro-accent/30 px-3 py-2 text-center sm:px-4 sm:py-3">
+      <p class="font-mono text-[0.65rem] text-retro-text/50 sm:text-xs">
         İsim Şehir Katman &copy; 2026. Tüm hakları saklıdır.
-        <a href="/privacy" data-link class="text-retro-accent/60 hover:text-retro-accent ml-2">Gizlilik Politikası</a>
+        <a href="/privacy" data-link class="text-retro-accent/60 hover:text-retro-accent ml-1 sm:ml-2">Gizlilik Politikası</a>
       </p>
     </footer>
   </div>

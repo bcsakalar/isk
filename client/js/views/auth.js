@@ -4,11 +4,11 @@ function AuthView(container) {
 
   function render() {
     container.innerHTML = `
-      <div class="max-w-md mx-auto mt-8">
-        <div class="text-center mb-8">
-          <h1 class="font-pixel text-retro-accent text-xl mb-2">İSİM ŞEHİR</h1>
-          <h2 class="font-pixel text-retro-gold text-sm">KATMAN</h2>
-          <p class="font-vt323 text-retro-text/60 mt-4 text-lg">Retro kelime savaşına hoş geldin!</p>
+      <div class="max-w-md mx-auto mt-4 sm:mt-8">
+        <div class="text-center mb-4 sm:mb-8">
+          <h1 class="font-pixel text-retro-accent text-base sm:text-xl mb-2">İSİM ŞEHİR</h1>
+          <h2 class="font-pixel text-retro-gold text-xs sm:text-sm">KATMAN</h2>
+          <p class="font-vt323 text-retro-text/60 mt-2 sm:mt-4 text-base sm:text-lg">Retro kelime savaşına hoş geldin!</p>
         </div>
 
         <div class="card-retro">

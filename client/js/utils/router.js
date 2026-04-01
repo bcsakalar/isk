@@ -107,35 +107,79 @@ const Router = (() => {
 
   function updateNav() {
     const nav = document.getElementById('nav-menu');
+    const mobileNav = document.getElementById('mobile-nav-menu');
     if (!nav) return;
 
     const user = Store.get('user');
     const currentPath = getCurrentPath();
 
+    let linksHtml = '';
+    let userHtml = '';
+
     if (user) {
       const isGuest = Store.isGuest();
-      nav.innerHTML = `
+      linksHtml = `
         <a href="/" data-link class="font-vt323 text-sm ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
         <a href="/leaderboard" data-link class="font-vt323 text-sm ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
         ${isGuest ? '' : `<a href="/profile" data-link class="font-vt323 text-sm ${currentPath === '/profile' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Profil</a>`}
         <a href="/contact" data-link class="font-vt323 text-sm ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
+      `;
+      userHtml = `
         <div class="flex items-center gap-1.5">
           <span class="player-avatar text-xs">${(user.display_name || user.username)[0].toUpperCase()}</span>
           <span class="font-vt323 text-sm text-retro-gold">${escapeHtml(user.display_name || user.username)}</span>
           ${isGuest ? '<span class="badge-retro text-[0.6rem] bg-retro-green/20 text-retro-green">Misafir</span>' : `<span class="badge-retro text-[0.6rem]">Lv.${user.level || 1}</span>`}
         </div>
         ${isGuest ? '<a href="/auth" data-link class="font-vt323 text-xs text-retro-green hover:text-retro-accent transition-colors">Kayıt Ol</a>' : ''}
-        <button id="btn-logout" class="font-vt323 text-xs text-retro-text/50 hover:text-retro-accent transition-colors">Çıkış</button>
+        <button class="btn-logout font-vt323 text-xs text-retro-text/50 hover:text-retro-accent transition-colors">Çıkış</button>
       `;
-      document.getElementById('btn-logout').addEventListener('click', () => App.logout());
     } else {
-      nav.innerHTML = `
+      linksHtml = `
         <a href="/" data-link class="font-vt323 text-sm ${currentPath === '/' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Lobi</a>
         <a href="/leaderboard" data-link class="font-vt323 text-sm ${currentPath === '/leaderboard' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">Sıralama</a>
         <a href="/contact" data-link class="font-vt323 text-sm ${currentPath === '/contact' ? 'text-retro-accent' : 'text-retro-text/70 hover:text-retro-accent'} transition-colors">İletişim</a>
-        <a href="/auth" data-link class="btn-retro text-[0.6rem]">Giriş Yap</a>
       `;
+      userHtml = `<a href="/auth" data-link class="btn-retro text-[0.6rem]">Giriş Yap</a>`;
     }
+
+    // Desktop nav
+    nav.innerHTML = linksHtml + userHtml;
+
+    // Mobile nav
+    if (mobileNav) {
+      mobileNav.innerHTML = `
+        <button id="mobile-nav-close" class="absolute top-3 right-3 font-vt323 text-2xl text-retro-text/50 hover:text-retro-accent">&times;</button>
+        ${linksHtml}
+        <div class="border-t border-retro-accent/20 pt-3 mt-1 flex flex-col gap-3">
+          ${userHtml}
+        </div>
+      `;
+      // Mobile nav close button
+      const closeBtn = mobileNav.querySelector('#mobile-nav-close');
+      if (closeBtn) closeBtn.addEventListener('click', closeMobileNav);
+    }
+
+    // Logout handlers (both desktop and mobile)
+    document.querySelectorAll('.btn-logout').forEach(btn => {
+      btn.addEventListener('click', () => {
+        closeMobileNav();
+        App.logout();
+      });
+    });
+  }
+
+  function openMobileNav() {
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const menu = document.getElementById('mobile-nav-menu');
+    if (overlay) overlay.classList.remove('hidden');
+    if (menu) menu.classList.remove('translate-x-full');
+  }
+
+  function closeMobileNav() {
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const menu = document.getElementById('mobile-nav-menu');
+    if (overlay) overlay.classList.add('hidden');
+    if (menu) menu.classList.add('translate-x-full');
   }
 
   function escapeHtml(str) {
@@ -149,11 +193,20 @@ const Router = (() => {
     const anchor = e.target.closest('a[data-link]');
     if (anchor) {
       e.preventDefault();
+      closeMobileNav();
       const href = anchor.getAttribute('href');
       if (href && href !== getCurrentPath()) {
         navigate(href);
       }
     }
+  });
+
+  // Hamburger menu toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    const hamBtn = document.getElementById('hamburger-btn');
+    const overlay = document.getElementById('mobile-nav-overlay');
+    if (hamBtn) hamBtn.addEventListener('click', openMobileNav);
+    if (overlay) overlay.addEventListener('click', closeMobileNav);
   });
 
   // Dinle

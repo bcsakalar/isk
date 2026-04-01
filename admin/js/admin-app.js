@@ -15,6 +15,24 @@ const AdminApp = (() => {
       return;
     }
 
+    // Mobile sidebar toggle
+    const hamburger = document.getElementById('admin-hamburger');
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('admin-overlay');
+    const sidebarClose = document.getElementById('admin-sidebar-close');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.remove('-translate-x-full');
+      if (overlay) overlay.classList.remove('hidden');
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.add('-translate-x-full');
+      if (overlay) overlay.classList.add('hidden');
+    }
+    if (hamburger) hamburger.addEventListener('click', openSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+
     loadDashboard();
 
     // Sidebar link click interception
@@ -22,6 +40,7 @@ const AdminApp = (() => {
       const anchor = e.target.closest('a[data-nav]');
       if (anchor) {
         e.preventDefault();
+        closeSidebar();
         const href = anchor.getAttribute('href');
         if (href) {
           history.pushState(null, '', href);
@@ -127,17 +146,17 @@ const AdminApp = (() => {
   function userRow(u) {
     return `
       <div class="leaderboard-row cursor-pointer hover:bg-retro-accent/10 transition-colors" data-user-id="${u.id}">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
           <div class="player-avatar text-xs">${(u.username || '?')[0].toUpperCase()}</div>
-          <div>
-            <p class="font-vt323">${escapeHtml(u.display_name || u.username)}</p>
-            <p class="font-mono text-xs text-retro-text/40">${escapeHtml(u.email || '')} · Lv.${u.level || 1}</p>
+          <div class="min-w-0">
+            <p class="font-vt323 truncate">${escapeHtml(u.display_name || u.username)}</p>
+            <p class="font-mono text-[0.6rem] sm:text-xs text-retro-text/40 truncate">${escapeHtml(u.email || '')} · Lv.${u.level || 1}</p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="badge-retro text-xs">${u.role}</span>
-          ${u.is_banned ? '<span class="text-xs text-retro-accent">🚫 Banlı</span>' : ''}
-          <button class="text-xs text-retro-accent hover:underline" data-ban-user="${u.id}" data-banned="${u.is_banned}">
+        <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          <span class="badge-retro text-[0.55rem] sm:text-xs">${u.role}</span>
+          ${u.is_banned ? '<span class="text-[0.55rem] sm:text-xs text-retro-accent">🚫</span>' : ''}
+          <button class="text-[0.55rem] sm:text-xs text-retro-accent hover:underline" data-ban-user="${u.id}" data-banned="${u.is_banned}">
             ${u.is_banned ? 'Unban' : 'Ban'}
           </button>
         </div>
@@ -592,20 +611,20 @@ const AdminApp = (() => {
         <div class="space-y-2" id="contact-list">
           ${messages.length === 0 ? '<p class="font-vt323 text-retro-text/40">Henüz mesaj yok</p>' :
           messages.map(m => `
-            <div class="card-retro p-4 ${m.is_read ? 'opacity-60' : 'border-retro-gold/40'}">
-              <div class="flex items-center justify-between mb-2">
-                <div>
-                  <p class="font-vt323 text-lg ${m.is_read ? 'text-retro-text/50' : 'text-retro-gold'}">${escapeHtml(m.subject)}</p>
-                  <p class="font-mono text-xs text-retro-text/40">
+            <div class="card-retro p-3 sm:p-4 ${m.is_read ? 'opacity-60' : 'border-retro-gold/40'}">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
+                <div class="min-w-0">
+                  <p class="font-vt323 text-base sm:text-lg ${m.is_read ? 'text-retro-text/50' : 'text-retro-gold'} truncate">${escapeHtml(m.subject)}</p>
+                  <p class="font-mono text-[0.6rem] sm:text-xs text-retro-text/40 truncate">
                     ${escapeHtml(m.name)} &middot; ${escapeHtml(m.email)} &middot; ${new Date(m.created_at).toLocaleString('tr')}
                   </p>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-shrink-0">
                   ${m.is_read
-                    ? '<span class="badge-retro text-xs bg-retro-green/20 text-retro-green">✓ Okundu</span>'
-                    : `<button class="btn-retro text-xs" data-read-contact="${m.id}">OKUNDU</button>`
+                    ? '<span class="badge-retro text-[0.55rem] sm:text-xs bg-retro-green/20 text-retro-green">✓ Okundu</span>'
+                    : `<button class="btn-retro text-[0.55rem] sm:text-xs" data-read-contact="${m.id}">OKUNDU</button>`
                   }
-                  <button class="text-xs text-retro-accent hover:underline" data-delete-contact="${m.id}">SİL</button>
+                  <button class="text-[0.55rem] sm:text-xs text-retro-accent hover:underline" data-delete-contact="${m.id}">SİL</button>
                 </div>
               </div>
               <p class="font-vt323 text-sm text-retro-text/70 whitespace-pre-wrap">${escapeHtml(m.message)}</p>

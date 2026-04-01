@@ -52,10 +52,10 @@ function GameView(container, { params }) {
             </div>
 
             <!-- Harf -->
-            <div class="text-center py-6">
+            <div class="text-center py-4 sm:py-6">
               <div class="inline-block">
-                <span class="font-pixel text-6xl text-retro-accent animate-bounce-in" id="current-letter">${round?.letter || '?'}</span>
-                <p class="font-vt323 text-retro-text/50 mt-2">harfi ile başlayan kelimeler yaz</p>
+                <span class="font-pixel text-4xl sm:text-5xl lg:text-6xl text-retro-accent animate-bounce-in" id="current-letter">${round?.letter || '?'}</span>
+                <p class="font-vt323 text-retro-text/50 mt-2 text-sm sm:text-base">harfi ile başlayan kelimeler yaz</p>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ function GameView(container, { params }) {
 
       if (letterEl) {
         letterEl.textContent = round.letter;
-        letterEl.className = 'font-pixel text-6xl text-retro-accent animate-bounce-in';
+        letterEl.className = 'font-pixel text-4xl sm:text-5xl lg:text-6xl text-retro-accent animate-bounce-in';
       }
       if (roundEl) roundEl.textContent = round.round_number;
       if (answerSection) answerSection.classList.remove('hidden');

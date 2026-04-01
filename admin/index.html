@@ -10,10 +10,23 @@
 </head>
 <body class="bg-retro-bg text-retro-text min-h-screen">
   <div id="admin-app" class="flex min-h-screen">
+    <!-- Mobile Header -->
+    <div class="fixed top-0 left-0 right-0 bg-retro-surface border-b-2 border-retro-accent/30 p-3 flex items-center justify-between md:hidden z-40">
+      <h1 class="font-pixel text-retro-accent text-xs">İSK ADMIN</h1>
+      <button id="admin-hamburger" class="flex flex-col gap-1 p-1">
+        <span class="block w-5 h-0.5 bg-retro-text"></span>
+        <span class="block w-5 h-0.5 bg-retro-text"></span>
+        <span class="block w-5 h-0.5 bg-retro-text"></span>
+      </button>
+    </div>
+    <!-- Mobile overlay -->
+    <div id="admin-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden"></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-retro-surface border-r-2 border-retro-accent/30 p-4 space-y-4 hidden md:block">
-      <div class="text-center py-4 border-b border-retro-accent/20">
+    <aside id="admin-sidebar" class="fixed top-0 left-0 h-full w-64 bg-retro-surface border-r-2 border-retro-accent/30 p-4 space-y-4 z-50 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 md:block">
+      <div class="flex items-center justify-between py-4 border-b border-retro-accent/20 md:justify-center">
         <h1 class="font-pixel text-retro-accent text-xs">İSK ADMIN</h1>
+        <button id="admin-sidebar-close" class="font-vt323 text-2xl text-retro-text/50 hover:text-retro-accent md:hidden">&times;</button>
       </div>
       <nav class="space-y-2">
         <a href="/admin/dashboard" class="block px-3 py-2 rounded font-vt323 text-lg hover:bg-retro-accent/10 transition-colors" data-nav="dashboard">📊 Dashboard</a>
@@ -30,7 +43,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 overflow-auto">
+    <main class="flex-1 p-3 pt-14 overflow-auto md:p-6 md:pt-6">
       <div id="admin-content">
         <p class="font-vt323 text-retro-text/40 text-center py-20">Yükleniyor...</p>
       </div>

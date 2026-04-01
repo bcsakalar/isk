@@ -21,38 +21,46 @@
 
 @layer components {
   .btn-retro {
-    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-accent
+    @apply px-3 py-2 font-pixel text-[0.65rem] border-2 border-retro-accent
            bg-retro-accent text-white rounded cursor-pointer
            hover:bg-retro-accent/80 active:scale-95
            transition-all duration-150 uppercase tracking-wider
-           disabled:opacity-50 disabled:cursor-not-allowed;
+           disabled:opacity-50 disabled:cursor-not-allowed
+           sm:px-4 sm:py-2.5 sm:text-xs
+           md:px-6 md:py-3 md:text-sm;
   }
 
   .btn-retro-outline {
-    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-accent
+    @apply px-3 py-2 font-pixel text-[0.65rem] border-2 border-retro-accent
            bg-transparent text-retro-accent rounded cursor-pointer
            hover:bg-retro-accent hover:text-white
-           transition-all duration-150 uppercase tracking-wider;
+           transition-all duration-150 uppercase tracking-wider
+           sm:px-4 sm:py-2.5 sm:text-xs
+           md:px-6 md:py-3 md:text-sm;
   }
 
   .btn-retro-secondary {
-    @apply px-6 py-3 font-pixel text-sm border-2 border-retro-gold
+    @apply px-3 py-2 font-pixel text-[0.65rem] border-2 border-retro-gold
            bg-retro-gold text-retro-bg rounded cursor-pointer
            hover:bg-retro-gold/80 active:scale-95
-           transition-all duration-150 uppercase tracking-wider;
+           transition-all duration-150 uppercase tracking-wider
+           sm:px-4 sm:py-2.5 sm:text-xs
+           md:px-6 md:py-3 md:text-sm;
   }
 
   .card-retro {
     @apply bg-retro-surface border-2 border-retro-accent/30 rounded-lg
-           p-6 shadow-lg shadow-retro-accent/10;
+           p-3 shadow-lg shadow-retro-accent/10
+           sm:p-4 md:p-6;
   }
 
   .input-retro {
-    @apply w-full px-4 py-3 bg-retro-bg border-2 border-retro-accent/40
-           rounded text-retro-text font-vt323 text-lg
+    @apply w-full px-3 py-2 bg-retro-bg border-2 border-retro-accent/40
+           rounded text-retro-text font-vt323 text-base
            focus:border-retro-accent focus:outline-none focus:ring-1
            focus:ring-retro-accent placeholder-retro-text/40
-           transition-colors duration-200;
+           transition-colors duration-200
+           sm:px-4 sm:py-3 sm:text-lg;
   }
 
   .badge-retro {
@@ -67,8 +75,9 @@
   }
 
   .toast {
-    @apply p-4 rounded-lg border-2 font-vt323 text-lg
-           shadow-xl animate-bounce-in;
+    @apply p-3 rounded-lg border-2 font-vt323 text-base
+           shadow-xl animate-bounce-in
+           sm:p-4 sm:text-lg;
   }
 
   .toast-success { @apply bg-retro-green/90 border-retro-green text-white; }
@@ -81,7 +90,8 @@
   }
 
   .modal-content {
-    @apply card-retro max-w-md w-full mx-4 animate-bounce-in;
+    @apply card-retro max-w-md w-full mx-3 animate-bounce-in
+           sm:mx-4;
   }
 
   .timer-bar {
@@ -96,8 +106,9 @@
   .timer-bar-fill.danger { @apply bg-red-500 animate-pulse; }
 
   .player-avatar {
-    @apply w-10 h-10 rounded-full border-2 border-retro-accent
-           flex items-center justify-center font-pixel text-sm bg-retro-surface;
+    @apply w-8 h-8 rounded-full border-2 border-retro-accent
+           flex items-center justify-center font-pixel text-xs bg-retro-surface
+           sm:w-10 sm:h-10 sm:text-sm;
   }
 
   .category-tag {
@@ -106,9 +117,10 @@
   }
 
   .leaderboard-row {
-    @apply flex items-center justify-between p-3 rounded
+    @apply flex items-center justify-between p-2 rounded
            border border-retro-accent/20 bg-retro-surface/50
-           hover:bg-retro-accent/10 transition-colors;
+           hover:bg-retro-accent/10 transition-colors
+           sm:p-3;
   }
 
   .score-pop {
