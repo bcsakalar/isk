@@ -18,7 +18,7 @@ function initSocket(server) {
     },
     pingTimeout: 60000,
     pingInterval: 25000,
-    maxHttpBufferSize: 4e6, // 4MB max mesaj boyutu (base64 görsel desteği)
+    maxHttpBufferSize: 3e6, // 3MB max mesaj boyutu (base64 görsel desteği — 2.8MB limit + overhead)
   });
 
   // Middleware

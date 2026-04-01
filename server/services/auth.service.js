@@ -151,7 +151,7 @@ const authService = {
     return { user, accessToken };
   },
 
-  async refreshToken(refreshToken) {
+  async refreshToken(refreshToken, { ip, userAgent } = {}) {
     if (!refreshToken) throw new UnauthorizedError('Refresh token gerekli');
 
     // Token'ı hashleyip veritabanında ara
@@ -166,6 +166,16 @@ const authService = {
       // tüm kullanıcı oturumlarını kapat (token reuse = theft)
       // Not: Burada kullanıcıyı bilemeyiz, sadece geçersiz token olarak logla
       throw new UnauthorizedError('Geçersiz veya süresi dolmuş refresh token');
+    }
+
+    // IP/User-Agent uyumsuzluk kontrolü (şüpheli token kullanımı tespiti)
+    if (ip && session.ip_address && ip !== session.ip_address) {
+      const logger = require('../utils/logger');
+      logger.warn('Refresh token IP mismatch — possible token theft', {
+        userId: session.user_id,
+        sessionIp: session.ip_address,
+        requestIp: ip,
+      });
     }
 
     const user = await usersQueries.findById(session.user_id);

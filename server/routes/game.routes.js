@@ -4,8 +4,8 @@ const gameController = require('../controllers/game.controller');
 const { authenticateToken, checkBan } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
 
-router.get('/categories', gameController.getCategories);
-router.get('/leaderboard', gameController.getLeaderboard);
+router.get('/categories', apiLimiter, gameController.getCategories);
+router.get('/leaderboard', apiLimiter, gameController.getLeaderboard);
 
 router.use(authenticateToken, checkBan);
 router.use(apiLimiter);

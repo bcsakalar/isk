@@ -56,7 +56,10 @@ const authController = {
   async refresh(req, res, next) {
     try {
       const { refreshToken } = req.body;
-      const result = await authService.refreshToken(refreshToken);
+      const result = await authService.refreshToken(refreshToken, {
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+      });
       res.json({
         success: true,
         data: {

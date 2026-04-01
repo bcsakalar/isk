@@ -43,6 +43,9 @@ const roomService = {
 
     // Kategorileri ayarla
     if (categoryIds && categoryIds.length) {
+      if (categoryIds.length > 50) {
+        throw new BadRequestError('En fazla 50 kategori seçilebilir');
+      }
       await roomsQueries.setCategories(room.id, categoryIds);
     } else {
       const defaults = await gamesQueries.getDefaultCategories();

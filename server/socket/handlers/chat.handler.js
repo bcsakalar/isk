@@ -1,11 +1,17 @@
 const gamesQueries = require('../../db/queries/games.queries');
 const { sanitizeString } = require('../../middleware/sanitizer');
+const { checkEventLimit } = require('../middleware/socketRateLimit');
 const logger = require('../../utils/logger');
 
 function chatHandler(io, socket) {
   // Oda mesajı
   socket.on('chat:room', async ({ message }) => {
     if (!socket.currentRoom) return;
+
+    // Event bazlı rate limit: 3 mesaj/saniye
+    if (!checkEventLimit(socket.user.id, 'chat:room')) {
+      return socket.emit('chat:error', { message: 'Mesaj gönderme limiti aşıldı' });
+    }
 
     try {
       const clean = sanitizeString(message);

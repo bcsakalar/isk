@@ -33,8 +33,8 @@ const config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'dev-secret-change-me',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-me',
+    secret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-jwt-secret-for-testing-only' : undefined),
+    refreshSecret: process.env.JWT_REFRESH_SECRET || (process.env.NODE_ENV === 'test' ? 'test-refresh-secret-for-testing-only' : undefined),
     expiresIn: process.env.JWT_EXPIRES_IN || '15m',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
@@ -57,9 +57,19 @@ const config = {
   admin: {
     username: process.env.ADMIN_INITIAL_USERNAME || 'admin',
     email: process.env.ADMIN_INITIAL_EMAIL || 'admin@isimsehirkatman.com',
-    password: process.env.ADMIN_INITIAL_PASSWORD || 'Admin123!',
+    password: process.env.ADMIN_INITIAL_PASSWORD || (process.env.NODE_ENV === 'test' ? 'TestAdmin123!' : undefined),
   },
 };
+
+// Development ortamında JWT secret zorunluluğu (.env dosyası kontrolü)
+if (config.nodeEnv !== 'test') {
+  if (!config.jwt.secret) {
+    throw new Error('KRITIK: JWT_SECRET ortam değişkeni tanımlanmamış! .env dosyasına ekleyin.');
+  }
+  if (!config.jwt.refreshSecret) {
+    throw new Error('KRITIK: JWT_REFRESH_SECRET ortam değişkeni tanımlanmamış! .env dosyasına ekleyin.');
+  }
+}
 
 // Production ortamında güvenlik kontrolleri
 if (config.nodeEnv === 'production') {
@@ -70,7 +80,7 @@ if (config.nodeEnv === 'production') {
   if (!config.db.password) {
     throw new Error('KRITIK: Production ortamında DB_PASSWORD boş bırakılamaz!');
   }
-  if (config.admin.password === 'Admin123!') {
+  if (!config.admin.password || config.admin.password === 'Admin123!') {
     throw new Error('KRITIK: Production ortamında ADMIN_INITIAL_PASSWORD değiştirilmeli! Varsayılan şifre güvenli değil.');
   }
 }

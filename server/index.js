@@ -75,12 +75,12 @@ app.use('/api/kvkk', kvkkRoutes);
 app.use('/api/contact', contactRoutes);
 
 // ======= HEALTH CHECK =======
-app.get('/api/health', (req, res) => {
+app.get('/api/health', generalLimiter, (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 
 // ======= READINESS PROBE =======
-app.get('/api/ready', async (req, res) => {
+app.get('/api/ready', generalLimiter, async (req, res) => {
   try {
     const { query: dbQuery } = require('./config/database');
     await dbQuery('SELECT 1');

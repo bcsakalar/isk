@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const kvkkController = require('../controllers/kvkk.controller');
 const { authenticateToken } = require('../middleware/auth');
+const { apiLimiter } = require('../middleware/rateLimiter');
+
+router.use(apiLimiter);
 
 router.post('/accept-privacy', authenticateToken, kvkkController.acceptPrivacy);
 router.get('/privacy-status', authenticateToken, kvkkController.getPrivacyStatus);

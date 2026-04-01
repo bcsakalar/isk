@@ -19,7 +19,9 @@ const adminController = {
       const { search } = req.query;
       let users;
       if (search) {
-        users = await usersQueries.searchUsers(search);
+        // DoS koruması: arama parametresi uzunluğunu sınırla
+        const safeTerm = String(search).slice(0, 100);
+        users = await usersQueries.searchUsers(safeTerm);
       } else {
         users = await usersQueries.listAllForAdmin(100);
       }

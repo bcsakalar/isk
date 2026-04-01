@@ -5,7 +5,7 @@ const { authenticateToken, checkBan } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Public endpoints (no auth required)
-router.get('/preview/:code', roomController.getPreview);
+router.get('/preview/:code', apiLimiter, roomController.getPreview);
 router.get('/public', apiLimiter, roomController.listPublic);
 
 router.use(authenticateToken, checkBan);

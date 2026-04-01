@@ -27,13 +27,13 @@ describe('socketAuth middleware', () => {
     });
   });
 
-  it('query.token ile de çalışmalı', (done) => {
+  it('query.token artık desteklenmemeli (güvenlik: URL log sızıntısı)', (done) => {
     const token = jwt.sign({ id: 2, username: 'user2', role: 'player' }, TEST_SECRET, { expiresIn: '1h' });
     const socket = createMockSocket(token, 'query');
 
     socketAuth(socket, (err) => {
-      expect(err).toBeUndefined();
-      expect(socket.user.id).toBe(2);
+      expect(err).toBeInstanceOf(Error);
+      expect(err.message).toContain('token');
       done();
     });
   });

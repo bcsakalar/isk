@@ -83,6 +83,7 @@ describe('GET /api/admin/users', () => {
       .set('Authorization', `Bearer ${generateAdminToken()}`);
 
     expect(res.status).toBe(200);
+    // search paramı güvenlik için 100 karaktere sınırlandırılır
     expect(usersQueries.searchUsers).toHaveBeenCalledWith('test');
   });
 });

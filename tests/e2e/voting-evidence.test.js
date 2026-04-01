@@ -1,5 +1,6 @@
 const { createSocketTestServer } = require('../helpers/socketTestServer');
 const { createPlayerClient, createPlayers, disconnectAll, resetClientCounter } = require('../helpers/socketTestClient');
+const { clearAllTimers } = require('../../server/socket/handlers/game.handler');
 
 // ─── Mock DB Queries ─────────────────────────────────────────────
 jest.mock('../../server/db/queries/rooms.queries');
@@ -30,6 +31,7 @@ afterAll(async () => {
 beforeEach(() => {
   jest.clearAllMocks();
   resetClientCounter();
+  clearAllTimers();
   roomsQueries.listActive.mockResolvedValue([]);
 });
 

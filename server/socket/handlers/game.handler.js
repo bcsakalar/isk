@@ -1,12 +1,14 @@
 const gameService = require('../../services/game.service');
 const roomsQueries = require('../../db/queries/rooms.queries');
 const gamesQueries = require('../../db/queries/games.queries');
+const { checkEventLimit, clearLimits } = require('../middleware/socketRateLimit');
 const logger = require('../../utils/logger');
 
 // Oda bazında zamanlayıcılar
 const roomTimers = new Map(); // roomId -> { timer, remaining, duration }
 const votingTimers = new Map(); // roomId -> { timer, remaining }
 const votingEndInProgress = new Set(); // roomId — race condition önleme
+const uploadCooldowns = new Map(); // userId -> lastUploadTime (module scope — reconnection bypass engellemek için)
 
 function gameHandler(io, socket) {
   // Oyunu başlat
@@ -38,6 +40,12 @@ function gameHandler(io, socket) {
     if (!socket.currentRoom) return;
     if (!answers || typeof answers !== 'object' || Array.isArray(answers)) {
       return socket.emit('game:error', { message: 'Geçersiz cevap formatı' });
+    }
+
+    // DoS koruması: aşırı sayıda key gönderimini engelle
+    const answerKeys = Object.keys(answers);
+    if (answerKeys.length > 30) {
+      return socket.emit('game:error', { message: 'Çok fazla cevap gönderildi' });
     }
 
     try {
@@ -97,18 +105,22 @@ function gameHandler(io, socket) {
   });
 
   // Görsel yükle (oylama fazında)
-  const uploadCooldowns = new Map(); // userId -> lastUploadTime
   socket.on('game:upload_image', async ({ answerId, imageData, mimeType }) => {
     if (!socket.currentRoom) return;
     if (!Number.isInteger(answerId) || answerId <= 0) {
       return socket.emit('game:error', { message: 'Geçersiz cevap ID' });
     }
 
-    // Rate limit: aynı kullanıcı 2 saniyede bir yükleyebilir
+    // Rate limit: aynı kullanıcı 2 saniyede bir yükleyebilir (server-side)
     const now = Date.now();
     const lastUpload = uploadCooldowns.get(socket.user.id) || 0;
     if (now - lastUpload < 2000) {
       return socket.emit('game:error', { message: 'Çok hızlı yükleme yapıyorsunuz, lütfen bekleyin' });
+    }
+
+    // Event bazlı rate limit kontrolü
+    if (!checkEventLimit(socket.user.id, 'game:upload_image')) {
+      return socket.emit('game:error', { message: 'Görsel yükleme limiti aşıldı, lütfen bekleyin' });
     }
     uploadCooldowns.set(socket.user.id, now);
 
@@ -364,6 +376,8 @@ function clearAllTimers() {
   for (const roomId of votingTimers.keys()) {
     clearVotingTimer(roomId);
   }
+  uploadCooldowns.clear();
+  clearLimits();
 }
 
 function getRoomTimerRemaining(roomId) {

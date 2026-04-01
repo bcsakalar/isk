@@ -84,11 +84,12 @@ describe('Auth Güvenlik Testleri', () => {
       expect(res.status).toBe(403);
     });
 
-    it('JWT secret ile imzalanmış token güvenilir — role JWT payload\'ından gelir', async () => {
+    it('JWT secret ile imzalanmış token güvenilir — role DB\'den doğrulanır', async () => {
       // JWT secret ile imzalandığı için token payload'ındaki role güvenilirdir
-      // adminGuard JWT'deki role'ü kontrol eder (doğru davranış)
+      // adminGuard DB'den role doğrulaması yapar (güçlendirilmiş davranış)
       const adminQueries = require('../../server/db/queries/admin.queries');
       adminQueries.getStats = jest.fn().mockResolvedValue({ totalUsers: 1 });
+      usersQueries.findById.mockResolvedValue({ id: 1, username: 'test', role: 'admin', is_banned: false });
 
       const fakeAdminToken = jwt.sign({ id: 1, username: 'test', role: 'admin' }, TEST_SECRET);
 
@@ -96,9 +97,9 @@ describe('Auth Güvenlik Testleri', () => {
         .get('/api/admin/dashboard')
         .set('Authorization', `Bearer ${fakeAdminToken}`);
 
-      // Token doğru secret ile imzalandığı için admin erişimi verilir
+      // Token doğru secret ile imzalandığı ve DB'de admin rolü onaylandığı için erişim verilir
       expect(res.status).toBe(200);
-    });
+    });;
   });
 
   describe('Yasaklı kullanıcı koruması', () => {

@@ -1,22 +1,41 @@
 const { ForbiddenError } = require('../utils/errors');
+const usersQueries = require('../db/queries/users.queries');
 
-function adminGuard(req, res, next) {
+async function adminGuard(req, res, next) {
   if (!req.user) {
     return next(new ForbiddenError('Yetkisiz erişim'));
   }
-  if (req.user.role !== 'admin') {
-    return next(new ForbiddenError('Bu işlem için admin yetkisi gerekli'));
+
+  // JWT'deki role claim'i DB'den doğrula (privilege escalation penceresini kapat)
+  try {
+    const user = await usersQueries.findById(req.user.id);
+    if (!user || user.role !== 'admin') {
+      return next(new ForbiddenError('Bu işlem için admin yetkisi gerekli'));
+    }
+    // req.user.role'u DB'den güncelle
+    req.user.role = user.role;
+  } catch {
+    return next(new ForbiddenError('Yetki doğrulama hatası'));
   }
+
   next();
 }
 
-function moderatorGuard(req, res, next) {
+async function moderatorGuard(req, res, next) {
   if (!req.user) {
     return next(new ForbiddenError('Yetkisiz erişim'));
   }
-  if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
-    return next(new ForbiddenError('Bu işlem için moderatör yetkisi gerekli'));
+
+  try {
+    const user = await usersQueries.findById(req.user.id);
+    if (!user || (user.role !== 'admin' && user.role !== 'moderator')) {
+      return next(new ForbiddenError('Bu işlem için moderatör yetkisi gerekli'));
+    }
+    req.user.role = user.role;
+  } catch {
+    return next(new ForbiddenError('Yetki doğrulama hatası'));
   }
+
   next();
 }
 

@@ -3,8 +3,10 @@ const router = express.Router();
 const adminController = require('../controllers/admin.controller');
 const { authenticateToken } = require('../middleware/auth');
 const { adminGuard } = require('../middleware/adminGuard');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 router.use(authenticateToken, adminGuard);
+router.use(apiLimiter);
 
 router.get('/dashboard', adminController.dashboard);
 router.get('/users', adminController.listUsers);
