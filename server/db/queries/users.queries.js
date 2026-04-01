@@ -89,8 +89,8 @@ const usersQueries = {
 
   async getLeaderboard(limit = 50) {
     const result = await query(
-      'SELECT id, username, display_name, avatar_url, xp, level, total_wins, total_games FROM users WHERE is_guest = FALSE ORDER BY xp DESC LIMIT $1',
-      [limit]
+      'SELECT id, username, display_name, avatar_url, xp, level, total_wins, total_games FROM users WHERE is_guest = FALSE AND role != $2 ORDER BY xp DESC LIMIT $1',
+      [limit, 'admin']
     );
     return result.rows;
   },

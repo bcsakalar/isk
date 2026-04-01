@@ -157,7 +157,7 @@ const gamesQueries = {
       `SELECT lb.*, u.username, u.display_name, u.avatar_url, u.level
        FROM leaderboard lb
        JOIN users u ON u.id = lb.user_id
-       WHERE lb.season = $1 AND lb.period_type = $2
+       WHERE lb.season = $1 AND lb.period_type = $2 AND u.role != 'admin'
        ORDER BY lb.total_score DESC LIMIT $3`,
       [season, periodType, limit]
     );
