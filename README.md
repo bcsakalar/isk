@@ -126,7 +126,7 @@ Turlar bittiğinde toplam skora göre kazanan belirlenir. Kazanan +50 bonus XP a
 
 ```bash
 # Klonla
-git clone https://github.com/your-username/katmanisimsehir.git
+git clone https://github.com/bcsakalar/katmanisimsehir.git
 cd katmanisimsehir
 
 # .env dosyasını oluştur ve düzenle
