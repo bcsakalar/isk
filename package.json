@@ -1,11 +1,39 @@
 {
   "name": "katmanisimsehir",
   "version": "1.0.0",
-  "description": "İsim Şehir Katman - Modern multiplayer word game",
+  "description": "İsim Şehir Katman - Real-time multiplayer Turkish word game with retro pixel aesthetics",
   "main": "server/index.js",
+  "homepage": "https://github.com/bcsakalar/katmanisimsehir#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcsakalar/katmanisimsehir.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bcsakalar/katmanisimsehir/issues"
+  },
+  "author": "bcsakalar",
+  "license": "MIT",
+  "keywords": [
+    "isim-sehir",
+    "word-game",
+    "multiplayer",
+    "socket-io",
+    "nodejs",
+    "express",
+    "postgresql",
+    "turkish-game",
+    "real-time",
+    "retro-gaming"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
     "migrate": "node server/db/migrate.js",
     "seed": "node server/db/seed.js",
     "css:build": "npx tailwindcss -i ./client/css/tailwind.css -o ./client/css/output.css --minify",
@@ -17,7 +45,8 @@
     "docker:logs": "docker compose -p isk -f docker-compose.prod.yml logs -f app --tail=100",
     "test": "jest --runInBand --forceExit",
     "test:watch": "jest --watch --runInBand",
-    "test:coverage": "jest --coverage --runInBand --forceExit"
+    "test:coverage": "jest --coverage --runInBand --forceExit",
+    "validate": "npm run lint && npm test"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -35,6 +64,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
     "jest": "^30.3.0",
     "nodemon": "^3.1.14",
     "socket.io-client": "^4.8.3",

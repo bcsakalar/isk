@@ -1,0 +1,35 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Her Pazartesi 06:00 UTC
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Close Stale Issues
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Stale check
+        uses: actions/stale@v9
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          stale-issue-message: >
+            Bu issue 30 gündür aktivite görmedi. 7 gün içinde bir güncelleme
+            yapılmazsa otomatik olarak kapatılacaktır. Hâlâ geçerliyse bir
+            yorum bırakarak aktif tutabilirsiniz.
+          stale-pr-message: >
+            Bu PR 30 gündür aktivite görmedi. 7 gün içinde güncellenmezse
+            otomatik olarak kapatılacaktır.
+          close-issue-message: >
+            Bu issue uzun süredir inaktif olduğu için kapatıldı.
+            Hâlâ geçerliyse yeni bir issue açabilirsiniz.
+          exempt-issue-labels: 'pinned,security,good first issue'
+          exempt-pr-labels: 'pinned,security'

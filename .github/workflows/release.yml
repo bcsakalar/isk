@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build CSS
+        run: npm run css:build
+
+      - name: Generate release notes
+        id: changelog
+        run: |
+          # Son iki tag arasındaki commit'leri al
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --oneline --no-merges)
+          else
+            COMMITS=$(git log ${PREVIOUS_TAG}..HEAD --oneline --no-merges)
+          fi
+
+          echo "## Değişiklikler" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          # Commit'leri kategorize et
+          echo "### ✨ Yeni Özellikler" >> RELEASE_NOTES.md
+          echo "$COMMITS" | grep -i "^[a-f0-9]* feat" >> RELEASE_NOTES.md || echo "- Yok" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🐛 Bug Düzeltmeleri" >> RELEASE_NOTES.md
+          echo "$COMMITS" | grep -i "^[a-f0-9]* fix" >> RELEASE_NOTES.md || echo "- Yok" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🔧 Diğer" >> RELEASE_NOTES.md
+          echo "$COMMITS" | grep -iv "^[a-f0-9]* feat\|^[a-f0-9]* fix" >> RELEASE_NOTES.md || echo "- Yok" >> RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -255,6 +255,11 @@ npm run seed                 # node server/db/seed.js
 npm run css:build            # Build & minify Tailwind CSS
 npm run css:watch            # Watch mode for Tailwind
 
+# Code Quality
+npm run lint                 # Run ESLint
+npm run lint:fix             # ESLint auto-fix
+npm run validate             # Lint + test (pre-push check)
+
 # Testing
 npm test                     # Run all tests (--runInBand --forceExit)
 npm run test:watch           # Watch mode
@@ -263,6 +268,17 @@ npm run test:coverage        # With coverage report
 # Local (without Docker)
 npm run dev                  # nodemon server/index.js
 npm start                    # node server/index.js
+```
+
+### Makefile Shortcuts
+
+```bash
+make help          # Show all available commands
+make dev           # Start Docker dev environment
+make test          # Run tests
+make lint          # Run ESLint
+make validate      # Lint + test (CI simulation)
+make setup         # First-time project setup
 ```
 
 ### Port Map
@@ -304,11 +320,18 @@ npm run test:coverage        # Generate coverage report
 
 ## CI/CD
 
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push to `main`/`develop` and on pull requests:
+GitHub Actions workflows (`.github/workflows/`) run on every push to `main`/`develop` and on pull requests:
 
-1. **Test** — install, run full test suite, generate coverage report, upload as artifact.
-2. **Security Audit** — `npm audit --omit=dev`.
-3. **Docker Build** — build the production Docker image to verify it compiles.
+1. **Lint** — ESLint code quality check.
+2. **Test** — full test suite with coverage report (uploaded as artifact).
+3. **Security Audit** — `npm audit --omit=dev --audit-level=high`.
+4. **Docker Build** — build the production Docker image to verify it compiles.
+
+Additional automation:
+
+- **Dependabot** — weekly dependency updates (npm, Docker, GitHub Actions) with version pinning for ESM-only packages.
+- **Stale bot** — auto-close issues/PRs inactive for 30+ days.
+- **Release** — auto-generate release notes on tag push (`v*`).
 
 ---
 
@@ -378,12 +401,26 @@ katmanisimsehir/
 │  ├─ configs/                    # isk.conf, isk-ssl-params.conf, rate-limit.conf, isk-temp-http.conf
 │  └─ scripts/                    # nginx-deploy.sh
 ├─ tests/                         # 40 test files (see Testing section)
+├─ .github/
+│  ├─ workflows/
+│  │  ├─ ci.yml                   # Lint → Test → Audit → Docker Build
+│  │  ├─ release.yml              # Auto release notes on tag push
+│  │  └─ stale.yml                # Auto-close inactive issues/PRs
+│  ├─ dependabot.yml              # Automated dependency updates
+│  ├─ ISSUE_TEMPLATE/             # Bug report & feature request templates
+│  └─ pull_request_template.md    # PR checklist template
 ├─ Dockerfile                     # Multi-stage: base → dev → build → production
 ├─ docker-compose.dev.yml         # Dev: App:3007, DB:5437
 ├─ docker-compose.prod.yml        # Prod: App:3006, DB:internal
 ├─ docker-entrypoint.sh           # Container entrypoint (migrate + seed + start)
+├─ .editorconfig                  # IDE consistency (indent, charset, EOL)
+├─ .eslintrc.json                 # ESLint code quality rules
 ├─ jest.config.js                 # Jest configuration
+├─ Makefile                       # Developer shortcuts (make dev, make test, etc.)
 ├─ tailwind.config.js             # Retro gaming theme (Press Start 2P, pixel colors)
+├─ CONTRIBUTING.md                # Contribution guidelines
+├─ CODE_OF_CONDUCT.md             # Community standards
+├─ SECURITY.md                    # Security policy & vulnerability reporting
 └─ package.json                   # Dependencies & scripts
 ```
 
@@ -536,6 +573,17 @@ Deploy script: [`nginx/scripts/nginx-deploy.sh`](nginx/scripts/nginx-deploy.sh)
 - **Production image**: Node.js 20 Alpine, production-only deps, dumb-init, non-root user (`iskuser`)
 - **Health check**: `GET /api/health` every 30 s
 - **Security**: `security_opt: no-new-privileges`, `read_only` root filesystem, tmpfs for logs
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
+
+- [Bug Report](https://github.com/bcsakalar/katmanisimsehir/issues/new?template=bug_report.md)
+- [Feature Request](https://github.com/bcsakalar/katmanisimsehir/issues/new?template=feature_request.md)
+
+Please note that this project is released with a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to abide by its terms.
 
 ---
 

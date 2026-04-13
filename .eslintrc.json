@@ -1,0 +1,59 @@
+{
+  "env": {
+    "node": true,
+    "commonjs": true,
+    "es2022": true,
+    "jest": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "no-console": "off",
+    "no-var": "warn",
+    "prefer-const": "warn",
+    "eqeqeq": ["warn", "always"],
+    "curly": ["warn", "multi-line"],
+    "no-throw-literal": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-return-await": "warn",
+    "no-param-reassign": "off",
+    "no-shadow": "off",
+    "prefer-template": "off",
+    "no-duplicate-imports": "error",
+    "prefer-arrow-callback": "off",
+    "arrow-body-style": "off",
+    "no-debugger": "error",
+    "no-alert": "error"
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.js"],
+      "rules": {
+        "no-unused-vars": "off",
+        "no-var": "off",
+        "prefer-const": "off",
+        "eqeqeq": "off"
+      }
+    },
+    {
+      "files": ["client/**/*.js", "admin/**/*.js"],
+      "env": {
+        "browser": true,
+        "node": false
+      },
+      "rules": {
+        "no-alert": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    "coverage/",
+    "client/css/output.css",
+    "logs/"
+  ]
+}
